@@ -1,5 +1,7 @@
 # Restaurant Digital Menu
 
+> **Note:** For restaurant-specific information (name, address, menu items, and prices), see [docs/specs/menu-data.md](specs/menu-data.md)
+
 ## Objective
 Make restaurant menus digital to provide a better customer experience and easier menu management.
 
@@ -35,21 +37,55 @@ Digital menus provide significant advantages:
 
 ### Website Structure
 
-The digital menu website will include:
+The digital menu website will include multiple pages:
 
-1. **Restaurant Name** - Displayed prominently at the top
-2. **Category Sections** - Organized sections for different dish categories:
-   - Desserts
-   - Main Course
-   - Appetizers
-   - Beverages
-   - etc.
+1. **Home/Menu Page (index.html)** - Main digital menu
+   - Restaurant name and address displayed prominently
+   - Navigation bar with links to Menu, Gallery, and Contact pages
+   - Menu organized by categories (Starters, Main Course, Breads, Rice & Dal, etc.)
+   - Each dish displays: image, name, and price
+   - Responsive design for mobile viewing
 
-3. **Dish Information** - Each dish will display:
-   - **Image** - Visual representation of the dish
-   - **Name** - Dish name
-   - **Price** - Current price
-   - **Description** - Main ingredients or dish description
+2. **Image Gallery Page (gallery.html)** - Restaurant ambiance showcase
+   - Navigation bar for easy page switching
+   - Responsive grid layout displaying restaurant photos
+   - Interior, exterior, and ambiance images
+   - Lightbox/modal functionality for enlarged image viewing
+   - Optimized images for fast loading
+
+3. **Contact Page (contact.html)** - Customer connection information
+   - Navigation bar
+   - Contact details (phone number and email)
+   - Embedded Google Maps showing restaurant location
+   - Full address with directions
+   - Operating hours (optional)
+   - Social media links (optional)
+   - Call-to-action buttons for phone and email
+
+### Page Components
+
+**Common Elements (All Pages):**
+- Responsive navigation bar
+- Restaurant branding (name and logo)
+- Footer with quick links and social media
+- Mobile-friendly design
+
+**Menu Page Specific:**
+- Category navigation/filtering
+- Dish cards with images and prices
+- Smooth scrolling between categories
+- Search functionality (optional)
+
+**Gallery Page Specific:**
+- Image grid layout
+- Lightbox modal for full-screen viewing
+- Image captions (optional)
+
+**Contact Page Specific:**
+- Interactive Google Maps
+- Click-to-call phone button
+- Click-to-email button
+- Contact form (optional)
 
 ### Directory Structure
 ```
@@ -61,10 +97,14 @@ restaurant-menu/
 ├── static/
 │   ├── css/
 │   │   └── styles.css
-│   ├── images/ (dish images)
+│   ├── images/
+│   │   ├── dishes/ (dish images)
+│   │   └── gallery/ (restaurant ambiance images)
 │   └── js/
 │       └── script.js
-└── index.html
+├── index.html (main menu page)
+├── gallery.html (image gallery page)
+└── contact.html (contact information page)
 ```
 
 ## Benefits
@@ -94,26 +134,50 @@ restaurant-menu/
 
 ### Phase 3: Development
 - [ ] Create `index.html` with basic structure
-  - [ ] Add restaurant name header
-  - [ ] Create navigation for categories
-  - [ ] Build dish card template
+  - [ ] Add restaurant name header and address
+  - [ ] Create navigation bar (Menu, Gallery, Contact)
+  - [ ] Create navigation for menu categories
+  - [ ] Build dish card template for all categories
   - [ ] Link to `static/css/styles.css`
   - [ ] Link to `static/js/script.js`
+- [ ] Create `gallery.html` for image gallery
+  - [ ] Add navigation bar
+  - [ ] Create responsive grid layout for images
+  - [ ] Implement lightbox/modal for enlarged images
+  - [ ] Add restaurant interior/exterior photos
+- [ ] Create `contact.html` for contact information
+  - [ ] Add navigation bar
+  - [ ] Display phone number
+  - [ ] Display email address
+  - [ ] Embed Google Maps with restaurant location
+  - [ ] Display full address
+  - [ ] Add operating hours (if available)
+  - [ ] Add social media links (if available)
 - [ ] Create `static/css/styles.css` for styling
   - [ ] Implement responsive design for mobile devices
   - [ ] Style header and restaurant branding
-  - [ ] Style category sections
+  - [ ] Style navigation bar
+  - [ ] Style menu category sections
   - [ ] Style dish cards (image, name, price, description)
+  - [ ] Style gallery page layout
+  - [ ] Style contact page layout
   - [ ] Add hover effects and animations
 - [ ] Create `static/js/script.js` for interactivity
   - [ ] Implement smooth scrolling between sections
   - [ ] Add category filtering/navigation
-  - [ ] Add any dynamic features (search, favorites, etc.)
+  - [ ] Add gallery lightbox functionality
+  - [ ] Add any dynamic features (search, etc.)
 
 ### Phase 4: Content Population
-- [ ] Add all dish images to `static/images/` directory
+- [ ] Create subdirectories in `static/images/`
+  - [ ] Create `static/images/dishes/` directory
+  - [ ] Create `static/images/gallery/` directory
+- [ ] Add all dish images to `static/images/dishes/` directory
+- [ ] Add restaurant ambiance images to `static/images/gallery/` directory
 - [ ] Input all dish names, prices, and descriptions
 - [ ] Organize dishes into appropriate categories
+- [ ] Add contact information (phone, email)
+- [ ] Get Google Maps embed code for location
 - [ ] Verify all content is accurate and up-to-date
 
 ### Phase 5: Testing & Optimization
