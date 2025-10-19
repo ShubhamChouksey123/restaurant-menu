@@ -5,13 +5,11 @@ on:
     branches: [ master, main ]
   workflow_dispatch:
 
-# Sets permissions for GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -25,23 +23,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Verify all files exist
+      - name: Verify files
         run: |
-          echo "Verifying project files..."
-          if [ ! -f "index.html" ]; then
-            echo "❌ index.html not found!"
-            exit 1
-          fi
-          if [ ! -d "static" ]; then
-            echo "❌ static directory not found!"
-            exit 1
-          fi
-          echo "✅ All required files present"
+          echo "Verifying files..."
 
-      - name: Count dish images
-        run: |
-          image_count=$(find static/images/dishes -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" 2>/dev/null | wc -l)
-          echo "Found $image_count dish images"
+          if [ ! -f "index.html" ]; then
+            echo "❌ index.html not found"
+            exit 1
+          fi
+
+          if [ ! -d "static" ]; then
+            echo "❌ static directory not found"
+            exit 1
+          fi
+
+          echo "✅ All files present"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -64,7 +60,7 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Deployment success
+      - name: Success
         run: |
-          echo "🎉 Successfully deployed to GitHub Pages!"
-          echo "🌐 Site URL: ${{ steps.deployment.outputs.page_url }}"
+          echo "🎉 Deployed successfully!"
+          echo "🌐 URL: ${{ steps.deployment.outputs.page_url }}"

@@ -18,62 +18,39 @@ jobs:
 
       - name: Check file sizes
         run: |
-          echo "=== Checking File Sizes ==="
+          echo "Checking file sizes..."
 
-          # Check HTML size
           if [ -f "index.html" ]; then
-            size=$(wc -c < "index.html")
-            size_kb=$((size / 1024))
-            echo "index.html: ${size_kb}KB"
+            size=$(wc -c < index.html)
+            kb=$((size / 1024))
+            echo "index.html: ${kb}KB"
           fi
 
-          # Check CSS size
           if [ -f "static/css/styles.css" ]; then
-            size=$(wc -c < "static/css/styles.css")
-            size_kb=$((size / 1024))
-            echo "styles.css: ${size_kb}KB"
+            size=$(wc -c < static/css/styles.css)
+            kb=$((size / 1024))
+            echo "styles.css: ${kb}KB"
           fi
 
-          # Check JS size
           if [ -f "static/js/script.js" ]; then
-            size=$(wc -c < "static/js/script.js")
-            size_kb=$((size / 1024))
-            echo "script.js: ${size_kb}KB"
-          fi
-
-          echo "✅ File size check complete"
-
-      - name: Check for debug code
-        run: |
-          echo "=== Checking for Debug Code ==="
-
-          if [ -f "static/js/script.js" ]; then
-            if grep -q "console.log" static/js/script.js; then
-              count=$(grep -c "console.log" static/js/script.js)
-              echo "⚠️ Found $count console.log statements"
-            else
-              echo "✅ No console.log found"
-            fi
+            size=$(wc -c < static/js/script.js)
+            kb=$((size / 1024))
+            echo "script.js: ${kb}KB"
           fi
 
       - name: Check HTML structure
         run: |
-          echo "=== Checking HTML Structure ==="
+          echo "Checking HTML structure..."
 
           if [ -f "index.html" ]; then
-            h1_count=$(grep -c "<h1" index.html || echo "0")
-            h2_count=$(grep -c "<h2" index.html || echo "0")
-            h3_count=$(grep -c "<h3" index.html || echo "0")
+            h1=$(grep -c "<h1" index.html || true)
+            h2=$(grep -c "<h2" index.html || true)
+            h3=$(grep -c "<h3" index.html || true)
+            img=$(grep -c "<img" index.html || true)
 
-            echo "Headings: H1=$h1_count, H2=$h2_count, H3=$h3_count"
-
-            img_count=$(grep -c "<img" index.html || echo "0")
-            echo "Images: $img_count"
-
-            echo "✅ Structure check complete"
+            echo "H1: $h1, H2: $h2, H3: $h3"
+            echo "Images: $img"
           fi
 
-      - name: Summary
-        run: |
-          echo "=== Quality Checks Complete ==="
-          echo "✅ All checks passed"
+      - name: Complete
+        run: echo "✅ Quality checks complete"
