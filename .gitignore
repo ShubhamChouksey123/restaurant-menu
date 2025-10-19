@@ -108,6 +108,6 @@ _site/
 .jekyll-metadata
 
 # Project Specific
-# Uncomment if needed:
-static/images/dishes/*.jpg
-static/images/gallery/*.jpg
+# Keep images in the repository for deployment
+# static/images/dishes/*.jpg
+# static/images/gallery/*.jpg
