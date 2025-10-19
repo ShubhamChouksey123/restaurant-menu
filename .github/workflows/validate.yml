@@ -100,19 +100,19 @@ jobs:
           large_count=0
           total_size=0
 
-          for img in static/images/dishes/*.{jpg,jpeg,png}; do
+          for img in static/images/dishes/*.jpg static/images/dishes/*.jpeg static/images/dishes/*.png; do
             [ -e "$img" ] || continue
             size=$(stat -c%s "$img" 2>/dev/null || echo "0")
             total_size=$((total_size + size))
-            size_mb=$(echo "scale=2; $size / 1024 / 1024" | bc)
+            size_kb=$((size / 1024))
 
             if [ $size -gt 524288 ]; then  # 512KB
-              echo "⚠️  Large file: $(basename $img) (${size_mb}MB)"
+              echo "⚠️  Large file: $(basename $img) (${size_kb}KB)"
               ((large_count++))
             fi
           done
 
-          total_mb=$(echo "scale=2; $total_size / 1024 / 1024" | bc)
+          total_mb=$((total_size / 1024 / 1024))
           echo "Total images size: ${total_mb}MB"
 
           if [ $large_count -gt 0 ]; then
