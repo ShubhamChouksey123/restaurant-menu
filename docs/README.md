@@ -118,19 +118,21 @@ restaurant-menu/
 ## Project Checklist
 
 ### Phase 1: Project Setup
-- [ ] Review physical menu images in `docs/specs/` directory
-- [ ] Create `static/` directory structure
-  - [ ] Create `static/css/` directory
-  - [ ] Create `static/images/` directory for dish images
-  - [ ] Create `static/js/` directory
+- [x] Review physical menu images in `docs/specs/` directory
+- [x] Create `static/` directory structure
+  - [x] Create `static/css/` directory
+  - [x] Create `static/images/` directory for dish images
+  - [x] Create `static/js/` directory
 - [ ] Gather or create images for all menu dishes
-- [ ] Decide on restaurant name and branding
+- [x] Decide on restaurant name and branding
+- [x] Document restaurant information in `docs/specs/menu-data.md`
 
 ### Phase 2: Design & Planning
-- [ ] Define menu categories (Appetizers, Main Course, Desserts, Beverages, etc.)
-- [ ] List all dishes with prices and descriptions
-- [ ] Plan color scheme and design theme
-- [ ] Sketch wireframe/layout for the menu website
+- [x] Define menu categories (Appetizers, Main Course, Desserts, Beverages, etc.)
+- [x] List all dishes with prices and descriptions
+- [x] Plan color scheme and design theme (Red/Maroon based on physical menu)
+- [ ] Gather contact information (phone number, email)
+- [ ] Sketch wireframe/layout for the menu website (optional)
 
 ### Phase 3: Development
 - [ ] Create `index.html` with basic structure
@@ -174,9 +176,9 @@ restaurant-menu/
   - [ ] Create `static/images/gallery/` directory
 - [ ] Add all dish images to `static/images/dishes/` directory
 - [ ] Add restaurant ambiance images to `static/images/gallery/` directory
-- [ ] Input all dish names, prices, and descriptions
-- [ ] Organize dishes into appropriate categories
-- [ ] Add contact information (phone, email)
+- [x] Input all dish names, prices, and descriptions (documented in menu-data.md)
+- [x] Organize dishes into appropriate categories (16 categories defined)
+- [ ] Add contact information (phone, email) to menu-data.md
 - [ ] Get Google Maps embed code for location
 - [ ] Verify all content is accurate and up-to-date
 
