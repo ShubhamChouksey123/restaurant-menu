@@ -55,6 +55,7 @@ Transform traditional physical restaurant menus into a modern digital experience
 |-----------|------------|---------|
 | Frontend | HTML5, CSS3, JavaScript | User interface |
 | Styling | CSS Grid, Flexbox | Responsive layout |
+| State Management | localStorage API | Cart persistence |
 | Images | Unsplash + Custom | Professional photography |
 | Hosting | GitHub Pages | Free, reliable hosting |
 | CI/CD | GitHub Actions | Automated validation & deployment |
@@ -88,11 +89,37 @@ Transform traditional physical restaurant menus into a modern digital experience
 - ✅ Workflow documentation
 - ✅ Git configuration (author, .gitignore)
 
-### 🚧 Planned Features (v1.1.0 - In Progress)
+### ✅ Completed (v1.1.0 - E-Commerce Features)
+
+#### Shopping Cart System
+- ✅ **Cart State Management** - localStorage-based cart with persistence
+- ✅ **Add to Cart Buttons** - 126 buttons dynamically added to all dish cards
+- ✅ **Cart Icon & Badge** - Navigation cart button with live item counter
+- ✅ **Cart Sidebar** - Slide-in panel with full cart management
+- ✅ **Quantity Controls** - Increment/decrement buttons for each item
+- ✅ **Remove Items** - Delete functionality with confirmation
+- ✅ **Real-time Calculations** - Live total price updates
+- ✅ **Toast Notifications** - User feedback for cart actions
+- ✅ **Responsive Design** - Mobile-optimized cart UI
+
+#### Bill Generation System
+- ✅ **bill.html** - Professional invoice page
+- ✅ **Auto Bill Number** - Generated format: BKK + YYMM + random
+- ✅ **Itemized Table** - All cart items with quantities and totals
+- ✅ **Tax Calculations** - GST (5%) and Service Charge (2%)
+- ✅ **Print Functionality** - Print-optimized layout for receipts
+- ✅ **Empty State** - Friendly message when cart is empty
+- ✅ **Clear Cart** - Reset functionality with confirmation
+
+#### Technical Implementation
+- ✅ **Zero Backend** - Fully client-side with localStorage
+- ✅ **~1,100 Lines** - Cart logic, UI, CSS across 3 files
+- ✅ **Offline Ready** - Works without internet after initial load
+- ✅ **Data Persistence** - Cart survives page refreshes and browser restarts
+
+### 🚧 Planned Features (v1.1.0 - Remaining)
 
 - [ ] **Restaurant Logo** - Brand identity in header
-- [ ] **Shopping Cart** - Add items to cart with quantity controls
-- [ ] **Bill Generation** - Itemized bill page with cart totals
 - [ ] **Modern UI Update** - Enhanced aesthetics and animations
 
 ### 🚧 Future Versions
@@ -491,6 +518,22 @@ this.items = savedCart ? JSON.parse(savedCart) : [];
 3. Preview locally
 4. Commit and push
 
+### Managing Shopping Cart
+The shopping cart uses localStorage for persistence. To clear all carts:
+```javascript
+// In browser console
+localStorage.removeItem('restaurantCart');
+```
+
+### Testing Cart Functionality
+1. Open `index.html` in browser
+2. Add items to cart using "Add to Cart" buttons
+3. Click cart icon to view sidebar
+4. Adjust quantities or remove items
+5. Click "Proceed to Bill" to view `bill.html`
+6. Test print functionality
+7. Refresh page to verify persistence
+
 ---
 
 ## Project Metrics
@@ -500,17 +543,29 @@ this.items = savedCart ? JSON.parse(savedCart) : [];
 | Total Dishes | 126 |
 | Categories | 16 |
 | Images | 126 (12MB) |
-| Lines of HTML | ~2,000 |
-| Lines of CSS | ~800 |
-| Lines of JS | ~400 |
+| Pages | 2 (index.html, bill.html) |
+| Lines of HTML | ~3,000 (index: ~2,000, bill: ~500) |
+| Lines of CSS | ~1,250 (styles: ~900, bill: ~350) |
+| Lines of JS | ~715 (script: ~715) |
+| Cart Code | ~250 lines (JS) + ~350 lines (CSS) |
 | GitHub Workflows | 4 |
-| Development Time | 2 days |
-| Current Version | 1.0.0 ✅ |
-| Next Version | 1.1.0 (In Progress) |
-| Status | Production Ready + Enhancement Phase |
+| Development Time | v1.0: 2 days, v1.1: 1 day |
+| Current Version | 1.1.0 (In Progress) ✅ |
+| Status | E-Commerce Features Active |
+
+### Feature Breakdown
+
+| Feature | Status | Lines of Code |
+|---------|--------|---------------|
+| Menu Display | ✅ Production | ~2,000 |
+| Search & Filter | ✅ Production | ~200 |
+| Shopping Cart | ✅ Completed | ~600 |
+| Bill Generation | ✅ Completed | ~500 |
+| CI/CD Workflows | ✅ Production | ~400 |
+| **Total** | | **~3,700** |
 
 ---
 
 **Last Updated:** October 2025
-**Version:** 1.0.0 (Production) → 1.1.0 (In Development)
-**Status:** 🚀 Production Ready + 🔨 Adding E-Commerce Features
+**Version:** 1.1.0 (E-Commerce Features)
+**Status:** 🚀 Production Ready + 🛒 Shopping Cart Active + 🧾 Bill Generation Ready
