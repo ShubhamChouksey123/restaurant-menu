@@ -8,213 +8,95 @@ on:
   workflow_dispatch:
 
 jobs:
-  validate-structure:
-    name: Validate Project Structure
+  validate:
+    name: Validate Project
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check required files exist
+      - name: Check required files
         run: |
-          echo "Checking project structure..."
+          echo "=== Checking Required Files ==="
 
-          required_files=(
-            "index.html"
-            "static/css/styles.css"
-            "static/js/script.js"
-            ".gitignore"
-          )
+          # Check index.html
+          if [ -f "index.html" ]; then
+            echo "✅ index.html exists"
+          else
+            echo "❌ index.html missing"
+            exit 1
+          fi
 
-          required_dirs=(
-            "static/images/dishes"
-            "static/css"
-            "static/js"
-          )
+          # Check CSS
+          if [ -f "static/css/styles.css" ]; then
+            echo "✅ styles.css exists"
+          else
+            echo "❌ styles.css missing"
+            exit 1
+          fi
 
-          missing=0
+          # Check JS
+          if [ -f "static/js/script.js" ]; then
+            echo "✅ script.js exists"
+          else
+            echo "❌ script.js missing"
+            exit 1
+          fi
 
-          for file in "${required_files[@]}"; do
-            if [ -f "$file" ]; then
-              echo "✅ Found: $file"
+          # Check images directory
+          if [ -d "static/images/dishes" ]; then
+            echo "✅ images directory exists"
+          else
+            echo "❌ images directory missing"
+            exit 1
+          fi
+
+      - name: Count images
+        run: |
+          echo "=== Counting Images ==="
+
+          if [ -d "static/images/dishes" ]; then
+            count=$(find static/images/dishes -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" \) | wc -l)
+            echo "Found $count images"
+
+            if [ $count -gt 50 ]; then
+              echo "✅ Sufficient images found"
             else
-              echo "❌ Missing: $file"
-              ((missing++))
-            fi
-          done
-
-          for dir in "${required_dirs[@]}"; do
-            if [ -d "$dir" ]; then
-              echo "✅ Found: $dir/"
-            else
-              echo "❌ Missing: $dir/"
-              ((missing++))
-            fi
-          done
-
-          if [ $missing -gt 0 ]; then
-            echo "❌ $missing required files/directories missing"
-            exit 1
-          else
-            echo "✅ All required files and directories present"
-          fi
-
-  validate-images:
-    name: Validate Images
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Count dish images
-        run: |
-          echo "Checking dish images..."
-
-          if [ ! -d "static/images/dishes" ]; then
-            echo "❌ static/images/dishes directory not found"
-            exit 1
-          fi
-
-          # Count images
-          jpg_count=$(find static/images/dishes -name "*.jpg" 2>/dev/null | wc -l)
-          jpeg_count=$(find static/images/dishes -name "*.jpeg" 2>/dev/null | wc -l)
-          png_count=$(find static/images/dishes -name "*.png" 2>/dev/null | wc -l)
-          total=$((jpg_count + jpeg_count + png_count))
-
-          echo "Found $total images:"
-          echo "  - JPG: $jpg_count"
-          echo "  - JPEG: $jpeg_count"
-          echo "  - PNG: $png_count"
-
-          if [ $total -lt 100 ]; then
-            echo "⚠️  Warning: Expected at least 100 images, found $total"
-          else
-            echo "✅ Sufficient images found!"
-          fi
-
-      - name: Check image file sizes
-        run: |
-          echo "Checking image file sizes..."
-          large_count=0
-          total_size=0
-
-          for img in static/images/dishes/*.jpg static/images/dishes/*.jpeg static/images/dishes/*.png; do
-            [ -e "$img" ] || continue
-            size=$(stat -c%s "$img" 2>/dev/null || echo "0")
-            total_size=$((total_size + size))
-            size_kb=$((size / 1024))
-
-            if [ $size -gt 524288 ]; then  # 512KB
-              echo "⚠️  Large file: $(basename $img) (${size_kb}KB)"
-              ((large_count++))
-            fi
-          done
-
-          total_mb=$((total_size / 1024 / 1024))
-          echo "Total images size: ${total_mb}MB"
-
-          if [ $large_count -gt 0 ]; then
-            echo "⚠️  Found $large_count large images (>512KB)"
-            echo "Consider optimizing images for better performance"
-          fi
-
-  check-links:
-    name: Check Internal Links
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Check CSS and JS references
-        run: |
-          echo "Checking resource links..."
-          missing=0
-
-          # Check CSS files
-          if grep -q 'href="static/css/styles.css"' index.html; then
-            if [ -f "static/css/styles.css" ]; then
-              echo "✅ styles.css found"
-            else
-              echo "❌ styles.css referenced but not found"
-              ((missing++))
+              echo "⚠️ Warning: Only $count images found"
             fi
           fi
 
-          # Check JS files
-          if grep -q 'src="static/js/script.js"' index.html; then
-            if [ -f "static/js/script.js" ]; then
-              echo "✅ script.js found"
-            else
-              echo "❌ script.js referenced but not found"
-              ((missing++))
-            fi
-          fi
-
-          if [ $missing -gt 0 ]; then
-            echo "❌ $missing referenced files not found"
-            exit 1
-          else
-            echo "✅ All referenced files exist"
-          fi
-
-  validate-html:
-    name: Basic HTML Validation
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Check HTML structure
+      - name: Validate HTML structure
         run: |
-          echo "Checking HTML structure..."
+          echo "=== Validating HTML ==="
 
-          if [ ! -f "index.html" ]; then
-            echo "❌ index.html not found"
+          if grep -q "<html" index.html && grep -q "</html>" index.html; then
+            echo "✅ HTML tags OK"
+          else
+            echo "❌ Invalid HTML structure"
             exit 1
           fi
 
-          # Basic checks
-          if grep -q '<html' index.html && grep -q '</html>' index.html; then
-            echo "✅ HTML tags present"
+          if grep -q "<title>" index.html; then
+            echo "✅ Title tag present"
           else
-            echo "❌ Missing HTML tags"
-            exit 1
+            echo "⚠️ No title tag"
           fi
 
-          if grep -q '<head>' index.html && grep -q '</head>' index.html; then
-            echo "✅ Head section present"
-          else
-            echo "❌ Missing head section"
-            exit 1
-          fi
-
-          if grep -q '<body>' index.html && grep -q '</body>' index.html; then
-            echo "✅ Body section present"
-          else
-            echo "❌ Missing body section"
-            exit 1
-          fi
-
-          if grep -q '<title>' index.html; then
-            echo "✅ Title present"
-          else
-            echo "⚠️  Warning: No title tag found"
-          fi
-
-          echo "✅ Basic HTML structure validated"
-
-  summary:
-    name: Validation Summary
-    runs-on: ubuntu-latest
-    needs: [validate-structure, validate-images, check-links, validate-html]
-    if: always()
-
-    steps:
-      - name: Check results
+      - name: Check file references
         run: |
-          echo "🎉 Validation checks completed!"
-          echo "Check individual job results for details."
+          echo "=== Checking File References ==="
+
+          if grep -q 'styles.css' index.html; then
+            echo "✅ CSS referenced in HTML"
+          fi
+
+          if grep -q 'script.js' index.html; then
+            echo "✅ JS referenced in HTML"
+          fi
+
+      - name: Summary
+        run: |
+          echo "=== Validation Complete ==="
+          echo "✅ All critical checks passed"

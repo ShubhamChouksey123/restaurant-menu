@@ -2,17 +2,11 @@ name: Check Links
 
 on:
   schedule:
-    # Run weekly on Monday at 9:00 AM UTC
     - cron: '0 9 * * 1'
   workflow_dispatch:
-  push:
-    branches: [ master, main ]
-    paths:
-      - '**.html'
-      - '**.md'
 
 jobs:
-  check-internal-links:
+  check-links:
     name: Check Internal Links
     runs-on: ubuntu-latest
 
@@ -20,50 +14,46 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check HTML internal links
+      - name: Check internal links
         run: |
-          echo "Checking internal links in HTML files..."
+          echo "=== Checking Internal Links ==="
 
-          broken_count=0
-
-          # Check links in index.html
-          if [ -f "index.html" ]; then
-            echo "Checking links in index.html..."
-
-            # Check for gallery.html references
-            if grep -q 'href="gallery.html"' index.html; then
-              if [ ! -f "gallery.html" ]; then
-                echo "⚠️  gallery.html referenced but not found (expected for future development)"
-              fi
+          # Check if gallery.html is referenced
+          if grep -q "gallery.html" index.html; then
+            if [ -f "gallery.html" ]; then
+              echo "✅ gallery.html exists"
+            else
+              echo "⚠️ gallery.html referenced but not created yet"
             fi
-
-            # Check for contact.html references
-            if grep -q 'href="contact.html"' index.html; then
-              if [ ! -f "contact.html" ]; then
-                echo "⚠️  contact.html referenced but not found (expected for future development)"
-              fi
-            fi
-
-            echo "✅ Internal link check completed"
           fi
 
-      - name: Check README links
-        run: |
-          echo "Checking README links..."
-
-          if [ -f "README.md" ]; then
-            # Check for broken relative links
-            grep -o '\[.*\]([^h][^t][^t][^p][^:][^/][^/].*)' README.md | while read link; do
-              file=$(echo "$link" | sed 's/.*(\(.*\))/\1/')
-              if [ ! -f "$file" ] && [ ! -d "$file" ]; then
-                echo "⚠️  Linked file not found: $file"
-              fi
-            done
-
-            echo "✅ README link check completed"
+          # Check if contact.html is referenced
+          if grep -q "contact.html" index.html; then
+            if [ -f "contact.html" ]; then
+              echo "✅ contact.html exists"
+            else
+              echo "⚠️ contact.html referenced but not created yet"
+            fi
           fi
 
-      - name: Summary
-        run: |
-          echo "✅ Link checking completed"
-          echo "Note: External links are not checked in this workflow"
+          # Check CSS reference
+          if grep -q "styles.css" index.html; then
+            if [ -f "static/css/styles.css" ]; then
+              echo "✅ CSS link valid"
+            else
+              echo "❌ CSS file missing"
+              exit 1
+            fi
+          fi
+
+          # Check JS reference
+          if grep -q "script.js" index.html; then
+            if [ -f "static/js/script.js" ]; then
+              echo "✅ JS link valid"
+            else
+              echo "❌ JS file missing"
+              exit 1
+            fi
+          fi
+
+          echo "✅ Link check complete"

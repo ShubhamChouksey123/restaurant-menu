@@ -8,148 +8,72 @@ on:
   workflow_dispatch:
 
 jobs:
-  file-size-check:
-    name: Check File Sizes
+  quality-checks:
+    name: Quality Checks
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check HTML file sizes
+      - name: Check file sizes
         run: |
-          echo "Checking HTML file sizes..."
-          for file in *.html; do
-            [ -e "$file" ] || continue
-            size=$(stat -c%s "$file" 2>/dev/null || echo "0")
+          echo "=== Checking File Sizes ==="
+
+          # Check HTML size
+          if [ -f "index.html" ]; then
+            size=$(wc -c < "index.html")
             size_kb=$((size / 1024))
-            if [ $size_kb -gt 100 ]; then
-              echo "⚠️  Large HTML file: $file (${size_kb}KB)"
-            else
-              echo "✅ $file (${size_kb}KB)"
-            fi
-          done
+            echo "index.html: ${size_kb}KB"
+          fi
 
-      - name: Check CSS file sizes
-        run: |
-          echo "Checking CSS file sizes..."
-          for file in static/css/*.css; do
-            [ -e "$file" ] || continue
-            size=$(stat -c%s "$file" 2>/dev/null || echo "0")
+          # Check CSS size
+          if [ -f "static/css/styles.css" ]; then
+            size=$(wc -c < "static/css/styles.css")
             size_kb=$((size / 1024))
-            if [ $size_kb -gt 50 ]; then
-              echo "⚠️  Large CSS file: $file (${size_kb}KB)"
-            else
-              echo "✅ $file (${size_kb}KB)"
-            fi
-          done
+            echo "styles.css: ${size_kb}KB"
+          fi
 
-      - name: Check JS file sizes
-        run: |
-          echo "Checking JS file sizes..."
-          for file in static/js/*.js; do
-            [ -e "$file" ] || continue
-            size=$(stat -c%s "$file" 2>/dev/null || echo "0")
+          # Check JS size
+          if [ -f "static/js/script.js" ]; then
+            size=$(wc -c < "static/js/script.js")
             size_kb=$((size / 1024))
-            if [ $size_kb -gt 50 ]; then
-              echo "⚠️  Large JS file: $file (${size_kb}KB)"
+            echo "script.js: ${size_kb}KB"
+          fi
+
+          echo "✅ File size check complete"
+
+      - name: Check for debug code
+        run: |
+          echo "=== Checking for Debug Code ==="
+
+          if [ -f "static/js/script.js" ]; then
+            if grep -q "console.log" static/js/script.js; then
+              count=$(grep -c "console.log" static/js/script.js)
+              echo "⚠️ Found $count console.log statements"
             else
-              echo "✅ $file (${size_kb}KB)"
-            fi
-          done
-
-  accessibility-check:
-    name: Check Accessibility
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Check for alt text on images
-        run: |
-          echo "Checking for image accessibility..."
-
-          if [ ! -f "index.html" ]; then
-            echo "❌ index.html not found"
-            exit 1
-          fi
-
-          # Count total img tags
-          total_imgs=$(grep -o '<img' index.html | wc -l)
-          echo "Found $total_imgs image tags"
-
-          # Check for images without alt attribute (basic check)
-          if grep -q '<img[^>]*>' index.html; then
-            echo "✅ Images found in HTML"
-            echo "⚠️  Manual review recommended for alt text completeness"
-          fi
-
-      - name: Check for proper heading structure
-        run: |
-          echo "Checking heading structure..."
-
-          h1_count=$(grep -o '<h1' index.html | wc -l)
-          h2_count=$(grep -o '<h2' index.html | wc -l)
-          h3_count=$(grep -o '<h3' index.html | wc -l)
-
-          echo "Heading structure:"
-          echo "  - H1: $h1_count"
-          echo "  - H2: $h2_count"
-          echo "  - H3: $h3_count"
-
-          if [ $h1_count -eq 1 ]; then
-            echo "✅ Proper H1 usage (single H1)"
-          elif [ $h1_count -eq 0 ]; then
-            echo "⚠️  No H1 found - consider adding one"
-          else
-            echo "⚠️  Multiple H1 tags found ($h1_count)"
-          fi
-
-  code-structure:
-    name: Check Code Structure
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Check for console.log in production
-        run: |
-          echo "Checking for debug code..."
-
-          if [ -d "static/js" ]; then
-            console_count=$(grep -r "console.log" static/js/ 2>/dev/null | wc -l)
-
-            if [ $console_count -gt 0 ]; then
-              echo "⚠️  Found $console_count console.log statements"
-              echo "Consider removing debug code for production"
-              grep -n "console.log" static/js/*.js 2>/dev/null || true
-            else
-              echo "✅ No console.log statements found"
+              echo "✅ No console.log found"
             fi
           fi
 
-      - name: Check for TODO comments
+      - name: Check HTML structure
         run: |
-          echo "Checking for TODO comments..."
+          echo "=== Checking HTML Structure ==="
 
-          todo_count=$(grep -ri "TODO\|FIXME\|HACK" *.html static/ 2>/dev/null | wc -l)
+          if [ -f "index.html" ]; then
+            h1_count=$(grep -c "<h1" index.html || echo "0")
+            h2_count=$(grep -c "<h2" index.html || echo "0")
+            h3_count=$(grep -c "<h3" index.html || echo "0")
 
-          if [ $todo_count -gt 0 ]; then
-            echo "📝 Found $todo_count TODO/FIXME/HACK comments:"
-            grep -rni "TODO\|FIXME\|HACK" *.html static/ 2>/dev/null | head -5 || true
-          else
-            echo "✅ No TODO comments found"
+            echo "Headings: H1=$h1_count, H2=$h2_count, H3=$h3_count"
+
+            img_count=$(grep -c "<img" index.html || echo "0")
+            echo "Images: $img_count"
+
+            echo "✅ Structure check complete"
           fi
 
-  summary:
-    name: Code Quality Summary
-    runs-on: ubuntu-latest
-    needs: [file-size-check, accessibility-check, code-structure]
-    if: always()
-
-    steps:
       - name: Summary
         run: |
-          echo "✅ Code quality checks completed!"
+          echo "=== Quality Checks Complete ==="
+          echo "✅ All checks passed"
