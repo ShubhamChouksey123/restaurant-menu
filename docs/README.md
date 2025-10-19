@@ -88,7 +88,14 @@ Transform traditional physical restaurant menus into a modern digital experience
 - ✅ Workflow documentation
 - ✅ Git configuration (author, .gitignore)
 
-### 🚧 Planned Features (Future Versions)
+### 🚧 Planned Features (v1.1.0 - In Progress)
+
+- [ ] **Restaurant Logo** - Brand identity in header
+- [ ] **Shopping Cart** - Add items to cart with quantity controls
+- [ ] **Bill Generation** - Itemized bill page with cart totals
+- [ ] **Modern UI Update** - Enhanced aesthetics and animations
+
+### 🚧 Future Versions
 
 - [ ] **gallery.html** - Restaurant ambiance photos
 - [ ] **contact.html** - Contact information and Google Maps
@@ -152,6 +159,24 @@ Transform traditional physical restaurant menus into a modern digital experience
 - [x] Documentation for updates
 - [ ] Regular price reviews
 - [ ] Seasonal menu updates
+
+### Phase 8: E-Commerce Features (v1.1.0) 🚧
+- [ ] Add restaurant logo to header
+- [ ] Implement shopping cart system
+  - [ ] Cart state management with localStorage
+  - [ ] Add to cart buttons on dish cards
+  - [ ] Quantity increment/decrement controls
+  - [ ] Cart icon with item counter in navigation
+  - [ ] Cart sidebar/modal UI
+- [ ] Create bill generation page (bill.html)
+  - [ ] Itemized list with quantities and prices
+  - [ ] Subtotal, tax, and total calculations
+  - [ ] Print/share functionality
+- [ ] UI modernization
+  - [ ] Updated color scheme and gradients
+  - [ ] Smooth animations and transitions
+  - [ ] Enhanced card designs with shadows
+  - [ ] Improved typography and spacing
 
 ---
 
@@ -249,21 +274,29 @@ restaurant-menu/
 
 ## Future Enhancements
 
-### v1.1.0 (Next Release)
+### v1.1.0 (Next Release - In Progress)
+- [ ] Restaurant logo in header
+- [ ] Shopping cart with quantity controls
+- [ ] Bill generation page
+- [ ] Modern UI update with animations
+
+### v1.2.0
 - [ ] Gallery page with restaurant photos
 - [ ] Contact page with Google Maps
 - [ ] Operating hours display
-
-### v1.2.0
 - [ ] Customer reviews section
+
+### v1.3.0
 - [ ] Special offers banner
 - [ ] Chef recommendations
+- [ ] Seasonal menu highlights
 
 ### v2.0.0 (Long Term)
 - [ ] Online ordering integration
 - [ ] Table reservation system
 - [ ] Multi-language support (Hindi, English)
 - [ ] Admin dashboard for menu management
+- [ ] Payment gateway integration
 
 ---
 
@@ -301,10 +334,12 @@ restaurant-menu/
 | Lines of JS | ~400 |
 | GitHub Workflows | 4 |
 | Development Time | 2 days |
-| Status | Production Ready ✅ |
+| Current Version | 1.0.0 ✅ |
+| Next Version | 1.1.0 (In Progress) |
+| Status | Production Ready + Enhancement Phase |
 
 ---
 
 **Last Updated:** October 2025
-**Version:** 1.0.0
-**Status:** 🚀 Production Ready
+**Version:** 1.0.0 (Production) → 1.1.0 (In Development)
+**Status:** 🚀 Production Ready + 🔨 Adding E-Commerce Features
