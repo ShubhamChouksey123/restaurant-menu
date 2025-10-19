@@ -4,9 +4,152 @@
    ================================================================= */
 
 // =================================================================
+// Shopping Cart State Management
+// =================================================================
+const Cart = {
+    items: [],
+
+    // Initialize cart from localStorage
+    init() {
+        const savedCart = localStorage.getItem('restaurantCart');
+        if (savedCart) {
+            this.items = JSON.parse(savedCart);
+        }
+        this.updateCartUI();
+    },
+
+    // Add item to cart
+    addItem(id, name, price, image) {
+        const existingItem = this.items.find(item => item.id === id);
+
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            this.items.push({
+                id,
+                name,
+                price,
+                image,
+                quantity: 1
+            });
+        }
+
+        this.save();
+        this.updateCartUI();
+        this.showNotification(`${name} added to cart!`);
+    },
+
+    // Remove item from cart
+    removeItem(id) {
+        this.items = this.items.filter(item => item.id !== id);
+        this.save();
+        this.updateCartUI();
+    },
+
+    // Update item quantity
+    updateQuantity(id, quantity) {
+        const item = this.items.find(item => item.id === id);
+        if (item) {
+            if (quantity <= 0) {
+                this.removeItem(id);
+            } else {
+                item.quantity = quantity;
+                this.save();
+                this.updateCartUI();
+            }
+        }
+    },
+
+    // Get total items count
+    getTotalItems() {
+        return this.items.reduce((total, item) => total + item.quantity, 0);
+    },
+
+    // Get total price
+    getTotalPrice() {
+        return this.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    },
+
+    // Clear cart
+    clear() {
+        this.items = [];
+        this.save();
+        this.updateCartUI();
+    },
+
+    // Save cart to localStorage
+    save() {
+        localStorage.setItem('restaurantCart', JSON.stringify(this.items));
+    },
+
+    // Update cart UI
+    updateCartUI() {
+        const cartCount = document.querySelector('.cart-count');
+        const cartItemsList = document.querySelector('.cart-items');
+        const cartTotal = document.querySelector('.cart-total-price');
+        const emptyCartMsg = document.querySelector('.empty-cart-message');
+
+        // Update cart count badge
+        if (cartCount) {
+            const totalItems = this.getTotalItems();
+            cartCount.textContent = totalItems;
+            cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
+        }
+
+        // Update cart items list
+        if (cartItemsList) {
+            if (this.items.length === 0) {
+                cartItemsList.innerHTML = '';
+                if (emptyCartMsg) emptyCartMsg.style.display = 'block';
+            } else {
+                if (emptyCartMsg) emptyCartMsg.style.display = 'none';
+                cartItemsList.innerHTML = this.items.map(item => `
+                    <div class="cart-item" data-id="${item.id}">
+                        <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                        <div class="cart-item-details">
+                            <h4 class="cart-item-name">${item.name}</h4>
+                            <p class="cart-item-price">₹${item.price}</p>
+                        </div>
+                        <div class="cart-item-controls">
+                            <button class="quantity-btn minus" onclick="Cart.updateQuantity('${item.id}', ${item.quantity - 1})" aria-label="Decrease quantity">-</button>
+                            <span class="quantity">${item.quantity}</span>
+                            <button class="quantity-btn plus" onclick="Cart.updateQuantity('${item.id}', ${item.quantity + 1})" aria-label="Increase quantity">+</button>
+                        </div>
+                        <button class="remove-item" onclick="Cart.removeItem('${item.id}')" aria-label="Remove item">🗑️</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Update total price
+        if (cartTotal) {
+            cartTotal.textContent = `₹${this.getTotalPrice()}`;
+        }
+    },
+
+    // Show notification
+    showNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'cart-notification';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 10);
+
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 2000);
+    }
+};
+
+// =================================================================
 // DOM Content Loaded - Initialize when page is ready
 // =================================================================
 document.addEventListener('DOMContentLoaded', function() {
+    Cart.init();
     initSmoothScrolling();
     initCategoryNavigation();
     initActiveNavigation();
@@ -15,6 +158,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initSearchFunctionality();
     initCategoryHighlight();
     initMobileMenu();
+    initCartUI();
+    initAddToCartButtons();
     console.log('✅ Restaurant Menu loaded successfully!');
 });
 
@@ -430,6 +575,135 @@ function debounce(func, wait) {
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
     };
+}
+
+// =================================================================
+// Initialize Cart UI - Create cart sidebar
+// =================================================================
+function initCartUI() {
+    // Create cart sidebar
+    const cartSidebar = document.createElement('div');
+    cartSidebar.className = 'cart-sidebar';
+    cartSidebar.id = 'cartSidebar';
+    cartSidebar.innerHTML = `
+        <div class="cart-header">
+            <h2>🛒 Your Cart</h2>
+            <button class="close-cart" id="closeCart" aria-label="Close cart">✕</button>
+        </div>
+        <div class="empty-cart-message" style="display: none;">
+            <p>🍽️ Your cart is empty</p>
+            <p>Add some delicious items!</p>
+        </div>
+        <div class="cart-items"></div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span class="cart-total-price">₹0</span>
+            </div>
+            <button class="checkout-btn" onclick="goToCheckout()">Proceed to Bill</button>
+            <button class="clear-cart-btn" onclick="confirmClearCart()">Clear Cart</button>
+        </div>
+    `;
+    document.body.appendChild(cartSidebar);
+
+    // Create cart button in navigation
+    const nav = document.querySelector('nav ul');
+    if (nav) {
+        const cartButton = document.createElement('li');
+        cartButton.innerHTML = `
+            <a href="#" class="cart-btn" id="cartBtn">
+                <span class="cart-icon">🛒</span>
+                <span class="cart-count" style="display: none;">0</span>
+            </a>
+        `;
+        nav.appendChild(cartButton);
+    }
+
+    // Toggle cart sidebar
+    document.getElementById('cartBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        cartSidebar.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    });
+
+    document.getElementById('closeCart').addEventListener('click', function() {
+        cartSidebar.classList.remove('open');
+        document.body.style.overflow = 'auto';
+    });
+
+    // Close cart when clicking outside
+    cartSidebar.addEventListener('click', function(e) {
+        if (e.target === cartSidebar) {
+            cartSidebar.classList.remove('open');
+            document.body.style.overflow = 'auto';
+        }
+    });
+}
+
+// =================================================================
+// Initialize Add to Cart Buttons
+// =================================================================
+function initAddToCartButtons() {
+    const dishCards = document.querySelectorAll('.dish-card');
+
+    dishCards.forEach(card => {
+        // Extract dish information
+        const dishName = card.querySelector('h3').textContent;
+        const priceText = card.querySelector('.price').textContent;
+        const price = parseInt(priceText.replace(/[^\d]/g, ''));
+        const image = card.querySelector('img').src;
+        const dishId = dishName.toLowerCase().replace(/\s+/g, '-');
+
+        // Create Add to Cart button
+        const addToCartBtn = document.createElement('button');
+        addToCartBtn.className = 'add-to-cart-btn';
+        addToCartBtn.innerHTML = '🛒 Add to Cart';
+        addToCartBtn.setAttribute('aria-label', `Add ${dishName} to cart`);
+
+        addToCartBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            Cart.addItem(dishId, dishName, price, image);
+
+            // Button animation
+            this.classList.add('added');
+            this.innerHTML = '✓ Added';
+            setTimeout(() => {
+                this.classList.remove('added');
+                this.innerHTML = '🛒 Add to Cart';
+            }, 1500);
+        });
+
+        // Add button to card
+        const priceElement = card.querySelector('.price');
+        priceElement.parentNode.insertBefore(addToCartBtn, priceElement.nextSibling);
+    });
+}
+
+// =================================================================
+// Checkout Function - Navigate to Bill Page
+// =================================================================
+function goToCheckout() {
+    if (Cart.items.length === 0) {
+        alert('Your cart is empty! Please add items first.');
+        return;
+    }
+    // Save cart and redirect to bill page
+    Cart.save();
+    window.location.href = 'bill.html';
+}
+
+// =================================================================
+// Clear Cart Confirmation
+// =================================================================
+function confirmClearCart() {
+    if (Cart.items.length === 0) {
+        return;
+    }
+
+    if (confirm('Are you sure you want to clear your cart?')) {
+        Cart.clear();
+        Cart.showNotification('Cart cleared!');
+    }
 }
 
 // =================================================================
