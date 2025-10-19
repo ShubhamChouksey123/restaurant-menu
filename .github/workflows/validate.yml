@@ -1,0 +1,247 @@
+name: Validate Files
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  validate-html:
+    name: Validate HTML
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate HTML files
+        uses: Cyb3r-Jak3/html5validator-action@v7.2.0
+        with:
+          root: .
+          css: true
+
+  validate-images:
+    name: Validate Images
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check if all dish images exist
+        run: |
+          echo "Checking for missing dish images..."
+          missing_count=0
+
+          # Check if images directory exists
+          if [ ! -d "static/images/dishes" ]; then
+            echo "❌ Error: static/images/dishes directory not found!"
+            exit 1
+          fi
+
+          # Count total images
+          total_images=$(find static/images/dishes -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" | wc -l)
+          echo "✅ Found $total_images dish images"
+
+          # Check for broken symlinks
+          find static/images/dishes -type l ! -exec test -e {} \; -print | while read broken; do
+            echo "❌ Broken symlink: $broken"
+            ((missing_count++))
+          done
+
+          # Minimum expected images (126 dishes)
+          if [ $total_images -lt 126 ]; then
+            echo "⚠️  Warning: Expected at least 126 images, found $total_images"
+          else
+            echo "✅ All dish images present!"
+          fi
+
+      - name: Validate image formats and sizes
+        run: |
+          echo "Validating image properties..."
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+
+          large_files=0
+          invalid_format=0
+
+          for img in static/images/dishes/*.{jpg,jpeg,png} 2>/dev/null; do
+            [ -e "$img" ] || continue
+
+            # Check file size (warn if > 500KB)
+            size=$(stat -f%z "$img" 2>/dev/null || stat -c%s "$img")
+            size_kb=$((size / 1024))
+
+            if [ $size_kb -gt 500 ]; then
+              echo "⚠️  Large file: $img (${size_kb}KB)"
+              ((large_files++))
+            fi
+
+            # Validate image format
+            if ! identify "$img" > /dev/null 2>&1; then
+              echo "❌ Invalid image: $img"
+              ((invalid_format++))
+            fi
+          done
+
+          echo "✅ Validation complete"
+          echo "Large files (>500KB): $large_files"
+          echo "Invalid formats: $invalid_format"
+
+          if [ $invalid_format -gt 0 ]; then
+            exit 1
+          fi
+
+  check-links:
+    name: Check Links
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check internal links
+        run: |
+          echo "Checking internal links in HTML files..."
+
+          # Check if referenced files exist
+          missing_files=0
+
+          # Check CSS links
+          for css in $(grep -oP 'href="\K[^"]*\.css' index.html 2>/dev/null); do
+            if [ ! -f "$css" ]; then
+              echo "❌ Missing CSS: $css"
+              ((missing_files++))
+            else
+              echo "✅ Found: $css"
+            fi
+          done
+
+          # Check JS links
+          for js in $(grep -oP 'src="\K[^"]*\.js' index.html 2>/dev/null); do
+            if [ ! -f "$js" ]; then
+              echo "❌ Missing JS: $js"
+              ((missing_files++))
+            else
+              echo "✅ Found: $js"
+            fi
+          done
+
+          # Check image references in HTML
+          echo "Checking image references..."
+          img_count=0
+          for img in $(grep -oP 'src="\K[^"]*\.(jpg|jpeg|png|gif|webp)' index.html 2>/dev/null); do
+            if [ ! -f "$img" ]; then
+              echo "⚠️  Referenced but not found: $img"
+            fi
+            ((img_count++))
+          done
+
+          echo "Total images referenced in HTML: $img_count"
+
+          if [ $missing_files -gt 0 ]; then
+            echo "❌ Found $missing_files missing files"
+            exit 1
+          else
+            echo "✅ All referenced files exist"
+          fi
+
+  lint-css:
+    name: Lint CSS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install stylelint
+        run: npm install -g stylelint stylelint-config-standard
+
+      - name: Create stylelint config
+        run: |
+          cat > .stylelintrc.json << 'EOF'
+          {
+            "extends": "stylelint-config-standard",
+            "rules": {
+              "selector-class-pattern": null,
+              "custom-property-pattern": null,
+              "no-descending-specificity": null
+            }
+          }
+          EOF
+
+      - name: Lint CSS files
+        run: stylelint "static/css/*.css" --allow-empty-input || echo "CSS linting completed with warnings"
+        continue-on-error: true
+
+  check-project-structure:
+    name: Check Project Structure
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify required files and directories
+        run: |
+          echo "Checking project structure..."
+
+          required_files=(
+            "index.html"
+            "static/css/styles.css"
+            "static/js/script.js"
+            ".gitignore"
+          )
+
+          required_dirs=(
+            "static/images/dishes"
+            "static/css"
+            "static/js"
+            "docs"
+          )
+
+          missing=0
+
+          for file in "${required_files[@]}"; do
+            if [ -f "$file" ]; then
+              echo "✅ $file"
+            else
+              echo "❌ Missing: $file"
+              ((missing++))
+            fi
+          done
+
+          for dir in "${required_dirs[@]}"; do
+            if [ -d "$dir" ]; then
+              echo "✅ $dir/"
+            else
+              echo "❌ Missing directory: $dir/"
+              ((missing++))
+            fi
+          done
+
+          if [ $missing -gt 0 ]; then
+            echo "❌ $missing required files/directories missing"
+            exit 1
+          else
+            echo "✅ All required files and directories present"
+          fi
+
+  summary:
+    name: Validation Summary
+    runs-on: ubuntu-latest
+    needs: [validate-html, validate-images, check-links, lint-css, check-project-structure]
+    if: always()
+
+    steps:
+      - name: Check validation results
+        run: |
+          echo "🎉 All validation checks completed!"
+          echo "Check individual job results above for details."

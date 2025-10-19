@@ -1,0 +1,204 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  prettier-check:
+    name: Check Code Formatting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Prettier
+        run: npm install -g prettier
+
+      - name: Create Prettier config
+        run: |
+          cat > .prettierrc.json << 'EOF'
+          {
+            "semi": true,
+            "singleQuote": true,
+            "tabWidth": 4,
+            "useTabs": false,
+            "printWidth": 100,
+            "htmlWhitespaceSensitivity": "ignore"
+          }
+          EOF
+
+      - name: Check HTML formatting
+        run: prettier --check "*.html" || echo "⚠️  HTML formatting suggestions available"
+        continue-on-error: true
+
+      - name: Check CSS formatting
+        run: prettier --check "static/css/*.css" || echo "⚠️  CSS formatting suggestions available"
+        continue-on-error: true
+
+      - name: Check JS formatting
+        run: prettier --check "static/js/*.js" || echo "⚠️  JS formatting suggestions available"
+        continue-on-error: true
+
+  eslint-check:
+    name: Lint JavaScript
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install ESLint
+        run: npm install -g eslint
+
+      - name: Create ESLint config
+        run: |
+          cat > .eslintrc.json << 'EOF'
+          {
+            "env": {
+              "browser": true,
+              "es2021": true
+            },
+            "extends": "eslint:recommended",
+            "parserOptions": {
+              "ecmaVersion": 12,
+              "sourceType": "script"
+            },
+            "rules": {
+              "no-unused-vars": "warn",
+              "no-console": "off"
+            }
+          }
+          EOF
+
+      - name: Lint JavaScript files
+        run: eslint static/js/*.js --no-error-on-unmatched-pattern || echo "⚠️  JavaScript linting completed with warnings"
+        continue-on-error: true
+
+  file-size-check:
+    name: Check File Sizes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check HTML file sizes
+        run: |
+          echo "Checking HTML file sizes..."
+          for file in *.html; do
+            [ -e "$file" ] || continue
+            size=$(stat -c%s "$file")
+            size_kb=$((size / 1024))
+            if [ $size_kb -gt 100 ]; then
+              echo "⚠️  Large HTML file: $file (${size_kb}KB)"
+            else
+              echo "✅ $file (${size_kb}KB)"
+            fi
+          done
+
+      - name: Check CSS file sizes
+        run: |
+          echo "Checking CSS file sizes..."
+          for file in static/css/*.css; do
+            [ -e "$file" ] || continue
+            size=$(stat -c%s "$file")
+            size_kb=$((size / 1024))
+            if [ $size_kb -gt 50 ]; then
+              echo "⚠️  Large CSS file: $file (${size_kb}KB)"
+            else
+              echo "✅ $file (${size_kb}KB)"
+            fi
+          done
+
+      - name: Check JS file sizes
+        run: |
+          echo "Checking JS file sizes..."
+          for file in static/js/*.js; do
+            [ -e "$file" ] || continue
+            size=$(stat -c%s "$file")
+            size_kb=$((size / 1024))
+            if [ $size_kb -gt 50 ]; then
+              echo "⚠️  Large JS file: $file (${size_kb}KB)"
+            else
+              echo "✅ $file (${size_kb}KB)"
+            fi
+          done
+
+      - name: Check image sizes
+        run: |
+          echo "Checking image sizes..."
+          large_count=0
+          total_size=0
+
+          for file in static/images/dishes/*.{jpg,jpeg,png}; do
+            [ -e "$file" ] || continue
+            size=$(stat -c%s "$file")
+            size_kb=$((size / 1024))
+            total_size=$((total_size + size))
+
+            if [ $size_kb -gt 200 ]; then
+              echo "⚠️  Large image: $(basename $file) (${size_kb}KB)"
+              ((large_count++))
+            fi
+          done
+
+          total_mb=$((total_size / 1024 / 1024))
+          echo "Total images size: ${total_mb}MB"
+          echo "Large images (>200KB): $large_count"
+
+          if [ $large_count -gt 10 ]; then
+            echo "⚠️  Warning: Many large images detected. Consider optimization."
+          fi
+
+  accessibility-check:
+    name: Check Accessibility
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pa11y
+        run: npm install -g pa11y-ci
+
+      - name: Check for alt text on images
+        run: |
+          echo "Checking for missing alt attributes..."
+          missing=0
+
+          for file in *.html; do
+            [ -e "$file" ] || continue
+            # Check for img tags without alt attribute
+            if grep -P '<img(?![^>]*alt=)' "$file" > /dev/null 2>&1; then
+              echo "⚠️  $file has images without alt text"
+              ((missing++))
+            else
+              echo "✅ $file - all images have alt text"
+            fi
+          done
+
+          if [ $missing -gt 0 ]; then
+            echo "⚠️  Found $missing files with missing alt text"
+          else
+            echo "✅ All images have alt text!"
+          fi
