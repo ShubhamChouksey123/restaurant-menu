@@ -133,16 +133,29 @@ Transform traditional physical restaurant menus into a modern digital experience
 - ✅ **Cubic-bezier Easing** - Custom animation timing functions
 - ✅ **Responsive Breakpoints** - Mobile-optimized animations
 
-### 🚧 Planned Features (v1.1.0 - Remaining)
+### ✅ Completed (v1.2.0 - Gallery Feature)
+
+#### Gallery Page
+- ✅ **gallery.html** - Restaurant ambiance photo gallery
+- ✅ **4 Restaurant Images** - Outdoor dining, entrance, interior, building facade
+- ✅ **Responsive Grid Layout** - 4 columns desktop, 3 tablet, 2 mobile, 1 small screens
+- ✅ **Lightbox/Modal** - Full-size image viewing with navigation
+- ✅ **Hover Effects** - Smooth zoom and overlay animations
+- ✅ **Keyboard Navigation** - Arrow keys and Escape for lightbox control
+- ✅ **Image Optimization** - WebP format for fast loading
+- ✅ **Consistent Styling** - Matches red/maroon theme from main site
+- ✅ **Three Gallery Sections** - Ambiance, Food Presentation, Special Events
+
+### 🚧 Planned Features (v1.2.0 - Remaining)
 
 - [ ] **Restaurant Logo** - Brand identity in header
 
 ### 🚧 Future Versions
 
-- [ ] **gallery.html** - Restaurant ambiance photos
 - [ ] **contact.html** - Contact information and Google Maps
 - [ ] **Multi-language** - Hindi + English support
 - [ ] **Admin Panel** - Easy menu updates without coding
+- [ ] **More Gallery Images** - Additional food presentation and event photos
 
 ---
 
@@ -336,12 +349,14 @@ restaurant-menu/
 │   ├── js/
 │   │   └── script.js           # Interactive features
 │   └── images/
-│       └── dishes/             # 126 dish images (800x600px JPG)
+│       ├── dishes/             # 126 dish images (800x600px JPG)
+│       └── gallery/            # 4 restaurant ambiance photos (WebP)
 ├── docs/
 │   ├── README.md               # This file (project planning)
 │   └── specs/                  # Original physical menu scans
 ├── index.html                  # Main menu page
 ├── bill.html                   # Bill generation page (v1.1.0)
+├── gallery.html                # Photo gallery page (v1.2.0)
 ├── .gitignore                  # Git ignore rules
 └── README.md                   # User-facing documentation
 ```
@@ -471,32 +486,133 @@ this.items = savedCart ? JSON.parse(savedCart) : [];
 
 ---
 
-## Image Guidelines
+## Gallery System (v1.2.0)
 
-### Specifications
+### Architecture Overview
+
+The gallery system is a **fully client-side photo viewer** with lightbox functionality. No backend required!
+
+### Components
+
+#### 1. Gallery Grid Layout (gallery.html:52-102)
+**Responsive Grid System:**
+- Desktop (1200px+): 4 columns
+- Tablet (768px-1199px): 3 columns
+- Mobile (480px-767px): 2 columns
+- Small screens (<480px): 1 column
+
+**Grid Features:**
+- CSS Grid with `auto-fill` for flexibility
+- Square aspect ratio (1:1) for consistent layout
+- Hover effects with image zoom and overlay
+- Lazy loading for performance optimization
+
+#### 2. Gallery Categories (gallery.html:363-392)
+**Three Main Sections:**
+1. **Restaurant Ambiance** - Interior/exterior photos (4 images)
+2. **Food Presentation** - Dish styling photos (future expansion)
+3. **Special Events** - Celebrations and gatherings (future expansion)
+
+#### 3. Lightbox Modal (gallery.html:154-260)
+**Full-Featured Image Viewer:**
+
+**Features:**
+- Full-screen modal overlay (rgba(0,0,0,0.95) background)
+- Centered image with max 90vw/90vh dimensions
+- Navigation buttons (previous/next) with hover effects
+- Close button with rotate animation
+- Keyboard support (← → arrows, Escape key)
+- Click outside to close
+- Smooth zoom-in animation on open
+
+**Controls:**
+- Previous/Next buttons (← →)
+- Close button (×) with rotation on hover
+- Keyboard navigation support
+- Background click to close
+
+#### 4. Image Data Management (gallery.html:445-475)
+**JavaScript Data Structure:**
+```javascript
+const galleryData = {
+    ambiance: [
+        { src: 'path/to/image.webp', caption: 'Caption', alt: 'Alt text' }
+    ],
+    food: [],
+    events: []
+};
+```
+
+**Key Methods:**
+- `initGallery()` - Loads all images into grid sections
+- `createGalleryItem(image, index)` - Creates gallery card with image and overlay
+- `openLightbox(index)` - Opens modal with selected image
+- `closeLightbox()` - Closes modal and restores scroll
+- `updateLightboxImage()` - Updates displayed image and navigation state
+- `navigateLightbox(direction)` - Moves to previous/next image
+
+### Image Specifications
+
+#### Dish Images (Menu)
 - **Format:** JPG (optimized for web)
 - **Dimensions:** 800x600 pixels (4:3 aspect ratio)
 - **File Size:** 50-150 KB per image
 - **Quality:** Professional food photography
 - **Naming:** kebab-case (e.g., `butter-chicken.jpg`)
 - **Total:** 126 images, ~12MB
+- **Sources:** Unsplash (123 images), Custom placeholders (3 images)
 
-### Sources
-- **Unsplash:** 123 images (97.6%)
-- **Placeholders:** 3 images (2.4%)
+#### Gallery Images (Ambiance)
+- **Format:** WebP (modern, optimized)
+- **File Size:** 100-170 KB per image
+- **Quality:** High-resolution restaurant photos
+- **Naming:** descriptive-kebab-case (e.g., `outdoor-dining-night.webp`)
+- **Total:** 4 images, ~560KB
+- **Sources:** Restaurant actual photos
+
+### User Flow
+
+```
+1. Customer clicks "Gallery" in navigation
+2. Views grid of restaurant ambiance photos
+3. Clicks any image to view full-size in lightbox
+4. Uses arrow buttons or keyboard to navigate between images
+5. Clicks X, Escape, or background to close lightbox
+6. Returns to menu via navigation or back button
+```
+
+### Technical Benefits
+
+✅ **Zero Backend** - Pure client-side implementation
+✅ **Responsive Design** - Perfect on all screen sizes
+✅ **Fast Loading** - WebP format reduces bandwidth
+✅ **Keyboard Accessible** - Full keyboard navigation support
+✅ **Touch Optimized** - Mobile-friendly interactions
+✅ **Smooth Animations** - CSS transitions for professional feel
+✅ **Lazy Loading** - Images load on demand for performance
+✅ **SEO Friendly** - Proper alt text and semantic HTML
+
+### Code Statistics
+
+| Component | Lines | File |
+|-----------|-------|------|
+| Gallery HTML | ~600 | gallery.html |
+| Gallery CSS | ~324 | gallery.html (inline) |
+| Gallery JS | ~150 | gallery.html (inline) |
+| **Total** | **~1,074** | 1 file |
 
 ---
 
 ## Future Enhancements
 
-### v1.1.0 (Current Release - Nearly Complete)
-- [ ] Restaurant logo in header
+### v1.1.0 (COMPLETED ✅)
 - [x] Shopping cart with quantity controls (COMPLETED ✅)
 - [x] Bill generation page (COMPLETED ✅)
 - [x] Modern UI update with animations (COMPLETED ✅)
 
-### v1.2.0
-- [ ] Gallery page with restaurant photos
+### v1.2.0 (Current Release - Nearly Complete)
+- [ ] Restaurant logo in header
+- [x] Gallery page with restaurant photos (COMPLETED ✅)
 - [ ] Contact page with Google Maps
 - [ ] Operating hours display
 - [ ] Customer reviews section
@@ -551,6 +667,29 @@ localStorage.removeItem('restaurantCart');
 6. Test print functionality
 7. Refresh page to verify persistence
 
+### Managing Gallery Images
+To add new images to the gallery:
+1. Add images to `static/images/gallery/` directory
+2. Use descriptive kebab-case filenames (e.g., `outdoor-dining-area.webp`)
+3. Optimize images (WebP format recommended, ~140KB or less)
+4. Edit `gallery.html` and add image data to the appropriate section:
+```javascript
+galleryData.ambiance.push({
+    src: 'static/images/gallery/your-image.webp',
+    caption: 'Your Caption Here',
+    alt: 'Descriptive alt text for accessibility'
+});
+```
+5. Commit and push changes
+
+### Testing Gallery Functionality
+1. Open `gallery.html` in browser
+2. Verify all images load correctly in the grid
+3. Click any image to open lightbox
+4. Test navigation with arrow buttons and keyboard (← →)
+5. Test close functionality (X button, Escape key, clicking outside)
+6. Verify responsive behavior on different screen sizes
+
 ---
 
 ## Project Metrics
@@ -559,16 +698,18 @@ localStorage.removeItem('restaurantCart');
 |--------|-------|
 | Total Dishes | 126 |
 | Categories | 16 |
-| Images | 126 (12MB) |
-| Pages | 2 (index.html, bill.html) |
-| Lines of HTML | ~3,000 (index: ~2,000, bill: ~500) |
-| Lines of CSS | ~1,596 (styles: ~1,596) |
-| Lines of JS | ~715 (script: ~715) |
+| Dish Images | 126 (12MB) |
+| Gallery Images | 4 (560KB) |
+| Pages | 3 (index.html, bill.html, gallery.html) |
+| Lines of HTML | ~3,600 (index: ~2,000, bill: ~500, gallery: ~600) |
+| Lines of CSS | ~1,900 (styles: ~1,596, gallery inline: ~324) |
+| Lines of JS | ~865 (script: ~715, gallery: ~150) |
 | Cart Code | ~250 lines (JS) + ~350 lines (CSS) |
+| Gallery Code | ~150 lines (JS) + ~324 lines (CSS) |
 | GitHub Workflows | 4 |
-| Development Time | v1.0: 2 days, v1.1: 1 day |
-| Current Version | 1.1.0 (Nearly Complete) ✅ |
-| Status | E-Commerce + Modern UI Active |
+| Development Time | v1.0: 2 days, v1.1: 1 day, v1.2: 0.5 days |
+| Current Version | 1.2.0 (Nearly Complete) ✅ |
+| Status | E-Commerce + Modern UI + Gallery Active |
 
 ### Feature Breakdown
 
@@ -579,11 +720,12 @@ localStorage.removeItem('restaurantCart');
 | Shopping Cart | ✅ Completed | ~600 |
 | Bill Generation | ✅ Completed | ~500 |
 | Modern UI | ✅ Completed | ~700 |
+| Gallery Page | ✅ Completed | ~474 |
 | CI/CD Workflows | ✅ Production | ~400 |
-| **Total** | | **~4,400** |
+| **Total** | | **~4,874** |
 
 ---
 
 **Last Updated:** October 2025
-**Version:** 1.1.0 (E-Commerce + Modern UI)
-**Status:** 🚀 Production Ready + 🛒 Shopping Cart Active + 🧾 Bill Generation Ready + 🎨 Modern UI Enhanced
+**Version:** 1.2.0 (E-Commerce + Modern UI + Gallery)
+**Status:** 🚀 Production Ready + 🛒 Shopping Cart Active + 🧾 Bill Generation Ready + 🎨 Modern UI Enhanced + 📸 Gallery Live
