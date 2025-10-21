@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gallery - Bapu Ki Kutia Restaurant Ambiance Photos">
+    <title>Gallery - Bapu Ki Kutia | Pure Vegetarian Restaurant</title>
+    <link rel="stylesheet" href="static/css/styles.css">
+    <style>
+        /* Gallery-specific styles */
+        .gallery-hero {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 4rem 0 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gallery-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: headerGlow 15s ease-in-out infinite;
+        }
+
+        .gallery-hero .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .gallery-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .gallery-hero p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Gallery Grid */
+        .gallery-container {
+            padding: 3rem 0 4rem;
+        }
+
+        .gallery-section {
+            margin-bottom: 4rem;
+        }
+
+        .gallery-section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 2rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .gallery-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .gallery-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Gallery Item */
+        .gallery-item {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-base);
+            background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition-slow);
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.15);
+        }
+
+        .gallery-item-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 50%);
+            opacity: 0;
+            transition: var(--transition-base);
+            display: flex;
+            align-items: flex-end;
+            padding: 1.5rem;
+        }
+
+        .gallery-item:hover .gallery-item-overlay {
+            opacity: 1;
+        }
+
+        .gallery-item-caption {
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            animation: zoomIn 0.3s ease-out;
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .lightbox-content img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: var(--radius-md);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-base);
+            backdrop-filter: blur(10px);
+        }
+
+        .lightbox-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-base);
+            backdrop-filter: blur(10px);
+        }
+
+        .lightbox-nav:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .lightbox-prev {
+            left: -70px;
+        }
+
+        .lightbox-next {
+            right: -70px;
+        }
+
+        .lightbox-caption {
+            position: absolute;
+            bottom: -50px;
+            left: 0;
+            right: 0;
+            color: white;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        /* Empty State */
+        .gallery-empty {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+        }
+
+        .gallery-empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .gallery-empty h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-medium);
+        }
+
+        .gallery-empty p {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .gallery-hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .gallery-hero p {
+                font-size: 0.95rem;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .lightbox-prev {
+                left: 10px;
+            }
+
+            .lightbox-next {
+                right: 10px;
+            }
+
+            .lightbox-close {
+                top: 10px;
+                right: 10px;
+            }
+
+            .lightbox-caption {
+                bottom: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>BAPU KI KUTIA</h1>
+            <p class="address">Khajuri Sadak, NH-18, Indore - Bhopal Rd, Bhopal, Madhya Pradesh 462030</p>
+            <p class="tagline">Pure Vegetarian - North Indian, South Indian, Chinese, Continental</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Menu</a></li>
+                <li><a href="gallery.html" class="active">Gallery</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="index.html#cart" class="cart-btn">
+                    <span class="cart-icon">🛒</span>
+                    <span class="cart-count" id="nav-cart-count">0</span>
+                </a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Gallery Hero Section -->
+    <section class="gallery-hero">
+        <div class="container">
+            <h1>Our Gallery</h1>
+            <p>Experience the ambiance and warmth of Bapu Ki Kutia through our photo gallery</p>
+        </div>
+    </section>
+
+    <!-- Gallery Container -->
+    <main class="gallery-container">
+        <div class="container">
+            <!-- Restaurant Ambiance Section -->
+            <section class="gallery-section" id="ambiance">
+                <h2>Restaurant Ambiance</h2>
+                <div class="gallery-grid" id="ambiance-grid">
+                    <!-- Images will be dynamically loaded here -->
+                    <!-- Example structure:
+                    <div class="gallery-item" data-index="0">
+                        <img src="static/images/gallery/ambiance-1.jpg" alt="Restaurant Interior">
+                        <div class="gallery-item-overlay">
+                            <p class="gallery-item-caption">Cozy Dining Area</p>
+                        </div>
+                    </div>
+                    -->
+                </div>
+            </section>
+
+            <!-- Food Presentation Section -->
+            <section class="gallery-section" id="food-presentation">
+                <h2>Food Presentation</h2>
+                <div class="gallery-grid" id="food-grid">
+                    <!-- Images will be dynamically loaded here -->
+                </div>
+            </section>
+
+            <!-- Special Events Section -->
+            <section class="gallery-section" id="special-events">
+                <h2>Special Events & Celebrations</h2>
+                <div class="gallery-grid" id="events-grid">
+                    <!-- Images will be dynamically loaded here -->
+                </div>
+            </section>
+
+            <!-- Empty State (shown when no images) -->
+            <div class="gallery-empty" style="display: none;" id="gallery-empty">
+                <div class="gallery-empty-icon">📷</div>
+                <h3>Gallery Coming Soon</h3>
+                <p>We're preparing beautiful photos of our restaurant to share with you.</p>
+                <a href="index.html" class="add-to-cart-btn" style="display: inline-block; width: auto; padding: 0.75rem 2rem;">Browse Our Menu</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-content">
+            <button class="lightbox-close" id="lightbox-close" aria-label="Close">×</button>
+            <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Previous">‹</button>
+            <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Next">›</button>
+            <img src="" alt="" id="lightbox-img">
+            <p class="lightbox-caption" id="lightbox-caption"></p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About Us</h3>
+                    <p>Bapu Ki Kutia serves authentic vegetarian cuisine with a perfect blend of North Indian, South Indian, Chinese, and Continental flavors.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Menu</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="#contact">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <p>Khajuri Sadak, NH-18, Indore - Bhopal Rd<br>Bhopal, Madhya Pradesh 462030</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Bapu Ki Kutia. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Gallery JavaScript -->
+    <script src="static/js/script.js"></script>
+    <script>
+        // Gallery data structure - populated with restaurant images
+        const galleryData = {
+            ambiance: [
+                {
+                    src: 'static/images/gallery/outdoor-dining-night.webp',
+                    caption: 'Outdoor Dining Area - Night Ambiance',
+                    alt: 'Beautiful outdoor dining area with ambient lighting and garden setting at night'
+                },
+                {
+                    src: 'static/images/gallery/entrance-exterior-garden.webp',
+                    caption: 'Restaurant Entrance & Garden',
+                    alt: 'Welcoming entrance with lush garden and outdoor seating area'
+                },
+                {
+                    src: 'static/images/gallery/interior-dining-area.webp',
+                    caption: 'Indoor Dining Area',
+                    alt: 'Modern interior dining space with comfortable seating and service counter'
+                },
+                {
+                    src: 'static/images/gallery/building-facade-highway.webp',
+                    caption: 'Bapu Ki Kutia - Highway View',
+                    alt: 'Restaurant building facade located on NH-18 highway'
+                }
+            ],
+            food: [
+                // Future: Add food presentation images here
+            ],
+            events: [
+                // Future: Add special events and celebrations images here
+            ]
+        };
+
+        // Flatten all images into a single array for lightbox navigation
+        let allImages = [];
+        let currentImageIndex = 0;
+
+        // Initialize gallery
+        function initGallery() {
+            const ambianceGrid = document.getElementById('ambiance-grid');
+            const foodGrid = document.getElementById('food-grid');
+            const eventsGrid = document.getElementById('events-grid');
+            const emptyState = document.getElementById('gallery-empty');
+
+            // Populate ambiance images
+            galleryData.ambiance.forEach((image, index) => {
+                const item = createGalleryItem(image, allImages.length);
+                ambianceGrid.appendChild(item);
+                allImages.push(image);
+            });
+
+            // Populate food images
+            galleryData.food.forEach((image, index) => {
+                const item = createGalleryItem(image, allImages.length);
+                foodGrid.appendChild(item);
+                allImages.push(image);
+            });
+
+            // Populate events images
+            galleryData.events.forEach((image, index) => {
+                const item = createGalleryItem(image, allImages.length);
+                eventsGrid.appendChild(item);
+                allImages.push(image);
+            });
+
+            // Show empty state if no images
+            if (allImages.length === 0) {
+                emptyState.style.display = 'block';
+                document.querySelectorAll('.gallery-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+            }
+        }
+
+        // Create gallery item element
+        function createGalleryItem(image, index) {
+            const item = document.createElement('div');
+            item.className = 'gallery-item';
+            item.setAttribute('data-index', index);
+            item.onclick = () => openLightbox(index);
+
+            const img = document.createElement('img');
+            img.src = image.src;
+            img.alt = image.alt;
+            img.loading = 'lazy';
+
+            const overlay = document.createElement('div');
+            overlay.className = 'gallery-item-overlay';
+
+            const caption = document.createElement('p');
+            caption.className = 'gallery-item-caption';
+            caption.textContent = image.caption;
+
+            overlay.appendChild(caption);
+            item.appendChild(img);
+            item.appendChild(overlay);
+
+            return item;
+        }
+
+        // Lightbox functionality
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxCaption = document.getElementById('lightbox-caption');
+        const lightboxClose = document.getElementById('lightbox-close');
+        const lightboxPrev = document.getElementById('lightbox-prev');
+        const lightboxNext = document.getElementById('lightbox-next');
+
+        function openLightbox(index) {
+            currentImageIndex = index;
+            updateLightboxImage();
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function updateLightboxImage() {
+            if (allImages.length === 0) return;
+
+            const image = allImages[currentImageIndex];
+            lightboxImg.src = image.src;
+            lightboxImg.alt = image.alt;
+            lightboxCaption.textContent = image.caption;
+
+            // Hide/show navigation buttons
+            lightboxPrev.style.display = currentImageIndex === 0 ? 'none' : 'flex';
+            lightboxNext.style.display = currentImageIndex === allImages.length - 1 ? 'none' : 'flex';
+        }
+
+        function navigateLightbox(direction) {
+            if (direction === 'prev' && currentImageIndex > 0) {
+                currentImageIndex--;
+            } else if (direction === 'next' && currentImageIndex < allImages.length - 1) {
+                currentImageIndex++;
+            }
+            updateLightboxImage();
+        }
+
+        // Event listeners
+        lightboxClose.onclick = closeLightbox;
+        lightboxPrev.onclick = () => navigateLightbox('prev');
+        lightboxNext.onclick = () => navigateLightbox('next');
+
+        // Close lightbox on background click
+        lightbox.onclick = (e) => {
+            if (e.target === lightbox) {
+                closeLightbox();
+            }
+        };
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') navigateLightbox('prev');
+            if (e.key === 'ArrowRight') navigateLightbox('next');
+        });
+
+        // Initialize gallery on page load
+        initGallery();
+
+        // Update cart count from localStorage
+        Cart.updateCartUI();
+    </script>
+</body>
+</html>
