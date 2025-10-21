@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Bill - Bapu Ki Kutia Pure Vegetarian Restaurant">
+    <title>Bill - Bapu Ki Kutia</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>">
+
+    <style>
+        /* =================================================================
+           Bill Page Styles
+           ================================================================= */
+
+        :root {
+            --primary-color: #c41e3a;
+            --primary-dark: #8b0000;
+            --text-dark: #2c3e50;
+            --text-light: #555;
+            --bg-light: #f8f9fa;
+            --border-color: #ddd;
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: linear-gradient(135deg, #fef5e7 0%, #f8f9fa 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .bill-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .bill-header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .bill-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .bill-header p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .bill-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Bill Body */
+        .bill-body {
+            padding: 2rem;
+        }
+
+        .empty-bill {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-light);
+        }
+
+        .empty-bill-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-bill h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .empty-bill p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .back-to-menu-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+        }
+
+        .back-to-menu-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Bill Items Table */
+        .bill-items {
+            margin-bottom: 2rem;
+        }
+
+        .bill-items h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        .items-table thead {
+            background: var(--bg-light);
+        }
+
+        .items-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-dark);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .items-table th:last-child,
+        .items-table td:last-child {
+            text-align: right;
+        }
+
+        .items-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .item-quantity {
+            color: var(--text-light);
+        }
+
+        .item-price {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Bill Summary */
+        .bill-summary {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .summary-row.subtotal {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-row.total {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            border-top: 2px solid var(--primary-color);
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Action Buttons */
+        .bill-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .bill-actions button,
+        .bill-actions a {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+        }
+
+        .print-btn {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+        }
+
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .back-btn {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .back-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .clear-bill-btn {
+            background: transparent;
+            color: #e74c3c;
+            border: 2px solid #e74c3c;
+        }
+
+        .clear-bill-btn:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* Footer */
+        .bill-footer {
+            text-align: center;
+            padding: 1.5rem;
+            background: var(--bg-light);
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .bill-footer p {
+            margin: 0.3rem 0;
+        }
+
+        .bill-footer .thank-you {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .bill-container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .bill-actions,
+            .back-to-menu-btn,
+            .clear-bill-btn {
+                display: none !important;
+            }
+
+            .bill-header {
+                background: white;
+                color: var(--text-dark);
+                border-bottom: 2px solid var(--primary-color);
+            }
+
+            .bill-summary {
+                background: white;
+                border: 2px solid var(--border-color);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .bill-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .bill-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .bill-info {
+                flex-direction: column;
+                gap: 0.3rem;
+            }
+
+            .bill-body {
+                padding: 1.5rem 1rem;
+            }
+
+            .items-table {
+                font-size: 0.9rem;
+            }
+
+            .items-table th,
+            .items-table td {
+                padding: 0.7rem 0.5rem;
+            }
+
+            .bill-actions {
+                flex-direction: column;
+            }
+
+            .summary-row.total {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .bill-header h1 {
+                font-size: 1.3rem;
+                letter-spacing: 1px;
+            }
+
+            .items-table {
+                font-size: 0.85rem;
+            }
+
+            .items-table th,
+            .items-table td {
+                padding: 0.5rem 0.3rem;
+            }
+
+            .summary-row {
+                font-size: 0.9rem;
+            }
+
+            .summary-row.total {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bill-container">
+        <!-- Bill Header -->
+        <div class="bill-header">
+            <h1>🍽️ Bapu Ki Kutia</h1>
+            <p>Pure Vegetarian Restaurant</p>
+            <p>Khajuri Sadak, NH-18, Bhopal, Madhya Pradesh 462030</p>
+            <div class="bill-info">
+                <span>Bill No: <span id="billNumber"></span></span>
+                <span>Date: <span id="billDate"></span></span>
+                <span>Time: <span id="billTime"></span></span>
+            </div>
+        </div>
+
+        <!-- Bill Body -->
+        <div class="bill-body">
+            <!-- Empty Bill Message -->
+            <div class="empty-bill" id="emptyBill" style="display: none;">
+                <div class="empty-bill-icon">🛒</div>
+                <h2>No Items in Cart</h2>
+                <p>Your cart is empty. Please add items to generate a bill.</p>
+                <a href="index.html" class="back-to-menu-btn">Browse Menu</a>
+            </div>
+
+            <!-- Bill Items -->
+            <div class="bill-items" id="billItems" style="display: none;">
+                <h2>Order Details</h2>
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Price</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsTableBody">
+                        <!-- Items will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+
+                <!-- Bill Summary -->
+                <div class="bill-summary">
+                    <div class="summary-row subtotal">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">₹0</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>GST (5%):</span>
+                        <span id="gst">₹0</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Service Charge (2%):</span>
+                        <span id="serviceCharge">₹0</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Grand Total:</span>
+                        <span id="grandTotal">₹0</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="bill-actions">
+                    <button class="print-btn" onclick="printBill()">🖨️ Print Bill</button>
+                    <a href="index.html" class="back-btn">← Back to Menu</a>
+                    <button class="clear-bill-btn" onclick="clearBill()">🗑️ Clear Bill</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bill Footer -->
+        <div class="bill-footer">
+            <p class="thank-you">Thank You for Dining With Us! 🙏</p>
+            <p>Visit us again soon!</p>
+            <p>For feedback: contact@bapukikutia.com | +91-XXXXXXXXXX</p>
+        </div>
+    </div>
+
+    <script>
+        // =================================================================
+        // Bill Page JavaScript
+        // =================================================================
+
+        // Load cart from localStorage
+        function loadCart() {
+            const cartData = localStorage.getItem('restaurantCart');
+            return cartData ? JSON.parse(cartData) : [];
+        }
+
+        // Generate bill number (random)
+        function generateBillNumber() {
+            const date = new Date();
+            const year = date.getFullYear().toString().slice(-2);
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const random = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
+            return `BKK${year}${month}${random}`;
+        }
+
+        // Format date
+        function formatDate(date) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('en-IN', options);
+        }
+
+        // Format time
+        function formatTime(date) {
+            return date.toLocaleTimeString('en-IN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+
+        // Calculate totals
+        function calculateBill(cartItems) {
+            const subtotal = cartItems.reduce((total, item) => {
+                return total + (item.price * item.quantity);
+            }, 0);
+
+            const gst = Math.round(subtotal * 0.05);
+            const serviceCharge = Math.round(subtotal * 0.02);
+            const grandTotal = subtotal + gst + serviceCharge;
+
+            return { subtotal, gst, serviceCharge, grandTotal };
+        }
+
+        // Display bill
+        function displayBill() {
+            const cartItems = loadCart();
+            const emptyBill = document.getElementById('emptyBill');
+            const billItems = document.getElementById('billItems');
+
+            // Set bill info
+            document.getElementById('billNumber').textContent = generateBillNumber();
+            document.getElementById('billDate').textContent = formatDate(new Date());
+            document.getElementById('billTime').textContent = formatTime(new Date());
+
+            // Check if cart is empty
+            if (cartItems.length === 0) {
+                emptyBill.style.display = 'block';
+                billItems.style.display = 'none';
+                return;
+            }
+
+            // Show bill items
+            emptyBill.style.display = 'none';
+            billItems.style.display = 'block';
+
+            // Populate items table
+            const tableBody = document.getElementById('itemsTableBody');
+            tableBody.innerHTML = cartItems.map(item => {
+                const itemTotal = item.price * item.quantity;
+                return `
+                    <tr>
+                        <td class="item-name">${item.name}</td>
+                        <td class="item-quantity">${item.quantity}</td>
+                        <td>₹${item.price}</td>
+                        <td class="item-price">₹${itemTotal}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Calculate and display totals
+            const { subtotal, gst, serviceCharge, grandTotal } = calculateBill(cartItems);
+            document.getElementById('subtotal').textContent = `₹${subtotal}`;
+            document.getElementById('gst').textContent = `₹${gst}`;
+            document.getElementById('serviceCharge').textContent = `₹${serviceCharge}`;
+            document.getElementById('grandTotal').textContent = `₹${grandTotal}`;
+        }
+
+        // Print bill
+        function printBill() {
+            window.print();
+        }
+
+        // Clear bill
+        function clearBill() {
+            if (confirm('Are you sure you want to clear this bill? This will also clear your cart.')) {
+                localStorage.removeItem('restaurantCart');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', displayBill);
+
+        // Console message
+        console.log('%c🍽️ Bapu Ki Kutia - Bill Page', 'color: #c41e3a; font-size: 16px; font-weight: bold;');
+    </script>
+</body>
+</html>

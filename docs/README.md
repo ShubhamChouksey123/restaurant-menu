@@ -55,6 +55,7 @@ Transform traditional physical restaurant menus into a modern digital experience
 |-----------|------------|---------|
 | Frontend | HTML5, CSS3, JavaScript | User interface |
 | Styling | CSS Grid, Flexbox | Responsive layout |
+| State Management | localStorage API | Cart persistence |
 | Images | Unsplash + Custom | Professional photography |
 | Hosting | GitHub Pages | Free, reliable hosting |
 | CI/CD | GitHub Actions | Automated validation & deployment |
@@ -88,12 +89,53 @@ Transform traditional physical restaurant menus into a modern digital experience
 - ✅ Workflow documentation
 - ✅ Git configuration (author, .gitignore)
 
-### 🚧 Planned Features (v1.1.0 - In Progress)
+### ✅ Completed (v1.1.0 - E-Commerce Features)
+
+#### Shopping Cart System
+- ✅ **Cart State Management** - localStorage-based cart with persistence
+- ✅ **Add to Cart Buttons** - 126 buttons dynamically added to all dish cards
+- ✅ **Cart Icon & Badge** - Navigation cart button with live item counter
+- ✅ **Cart Sidebar** - Slide-in panel with full cart management
+- ✅ **Quantity Controls** - Increment/decrement buttons for each item
+- ✅ **Remove Items** - Delete functionality with confirmation
+- ✅ **Real-time Calculations** - Live total price updates
+- ✅ **Toast Notifications** - User feedback for cart actions
+- ✅ **Responsive Design** - Mobile-optimized cart UI
+
+#### Bill Generation System
+- ✅ **bill.html** - Professional invoice page
+- ✅ **Auto Bill Number** - Generated format: BKK + YYMM + random
+- ✅ **Itemized Table** - All cart items with quantities and totals
+- ✅ **Tax Calculations** - GST (5%) and Service Charge (2%)
+- ✅ **Print Functionality** - Print-optimized layout for receipts
+- ✅ **Empty State** - Friendly message when cart is empty
+- ✅ **Clear Cart** - Reset functionality with confirmation
+
+#### Technical Implementation
+- ✅ **Zero Backend** - Fully client-side with localStorage
+- ✅ **~1,100 Lines** - Cart logic, UI, CSS across 3 files
+- ✅ **Offline Ready** - Works without internet after initial load
+- ✅ **Data Persistence** - Cart survives page refreshes and browser restarts
+
+### ✅ Completed (v1.1.0 - Modern UI Update)
+
+#### Visual Enhancements
+- ✅ **Enhanced CSS Variables** - Gradient system with primary/secondary gradients
+- ✅ **Animated Header** - 3-color gradient with floating glow animation
+- ✅ **Glassmorphism Navigation** - Backdrop blur with smooth hover effects
+- ✅ **Category Pills** - Modern gradient buttons with elastic animations
+- ✅ **Dish Card Animations** - Staggered fade-in with hover transforms
+- ✅ **Micro-interactions** - Button ripple effects, price glow animations
+- ✅ **Scroll Reveal** - Smooth category section reveals on scroll
+- ✅ **Fixed Card Heights** - Consistent alignment with flexbox layout
+- ✅ **Line Clamping** - 2-line title truncation for long dish names
+- ✅ **Enhanced Shadows** - Multi-level shadow system (xs/sm/md/lg/xl)
+- ✅ **Cubic-bezier Easing** - Custom animation timing functions
+- ✅ **Responsive Breakpoints** - Mobile-optimized animations
+
+### 🚧 Planned Features (v1.1.0 - Remaining)
 
 - [ ] **Restaurant Logo** - Brand identity in header
-- [ ] **Shopping Cart** - Add items to cart with quantity controls
-- [ ] **Bill Generation** - Itemized bill page with cart totals
-- [ ] **Modern UI Update** - Enhanced aesthetics and animations
 
 ### 🚧 Future Versions
 
@@ -160,23 +202,25 @@ Transform traditional physical restaurant menus into a modern digital experience
 - [ ] Regular price reviews
 - [ ] Seasonal menu updates
 
-### Phase 8: E-Commerce Features (v1.1.0) 🚧
+### Phase 8: E-Commerce Features (v1.1.0) ✅
 - [ ] Add restaurant logo to header
-- [ ] Implement shopping cart system
-  - [ ] Cart state management with localStorage
-  - [ ] Add to cart buttons on dish cards
-  - [ ] Quantity increment/decrement controls
-  - [ ] Cart icon with item counter in navigation
-  - [ ] Cart sidebar/modal UI
-- [ ] Create bill generation page (bill.html)
-  - [ ] Itemized list with quantities and prices
-  - [ ] Subtotal, tax, and total calculations
-  - [ ] Print/share functionality
-- [ ] UI modernization
-  - [ ] Updated color scheme and gradients
-  - [ ] Smooth animations and transitions
-  - [ ] Enhanced card designs with shadows
-  - [ ] Improved typography and spacing
+- [x] Implement shopping cart system
+  - [x] Cart state management with localStorage
+  - [x] Add to cart buttons on dish cards
+  - [x] Quantity increment/decrement controls
+  - [x] Cart icon with item counter in navigation
+  - [x] Cart sidebar/modal UI
+- [x] Create bill generation page (bill.html)
+  - [x] Itemized list with quantities and prices
+  - [x] Subtotal, tax, and total calculations
+  - [x] Print/share functionality
+- [x] UI modernization
+  - [x] Updated color scheme and gradients
+  - [x] Smooth animations and transitions
+  - [x] Enhanced card designs with shadows
+  - [x] Improved typography and spacing
+  - [x] Fixed category navigation hover bug
+  - [x] Fixed dish card alignment for long titles
 
 ---
 
@@ -226,6 +270,53 @@ Transform traditional physical restaurant menus into a modern digital experience
 - ✅ Free for public repositories
 - ✅ Status badges for confidence
 
+### Why localStorage for Cart Management?
+
+**Decision:** Use browser localStorage instead of backend database/API
+
+**Reasons:**
+- ✅ **Zero API Calls** - No server requests needed, instant cart operations
+- ✅ **Zero Cost** - No backend infrastructure or database hosting fees
+- ✅ **Offline Support** - Cart works without internet connection
+- ✅ **Instant Performance** - Sub-millisecond read/write operations
+- ✅ **Data Persistence** - Cart survives page refreshes and browser restarts
+- ✅ **Privacy-First** - User data stays on their device, no server tracking
+- ✅ **Simple Implementation** - No backend code, authentication, or session management
+- ✅ **Perfect for Static Sites** - Works seamlessly with GitHub Pages hosting
+
+**Technical Details:**
+- Storage capacity: 5-10MB per domain (more than enough for cart data)
+- Data format: JSON serialized cart items array
+- Persistence: Until user clears browser data or explicitly clears cart
+- Scope: Per-domain, not shared across different websites
+- Security: Accessible only by JavaScript from the same origin
+
+**Cart Data Structure:**
+```javascript
+[
+  {
+    id: "butter-chicken",
+    name: "Butter Chicken",
+    price: 280,
+    image: "static/images/dishes/butter-chicken.jpg",
+    quantity: 2
+  },
+  // ... more items
+]
+```
+
+**Implementation:**
+- `Cart.save()` → Writes to `localStorage.setItem('restaurantCart', JSON.stringify(items))`
+- `Cart.init()` → Reads from `localStorage.getItem('restaurantCart')` and parses JSON
+- Automatically syncs on every add/remove/update operation
+
+**Trade-offs:**
+- ❌ Cart not synced across devices (desktop vs mobile)
+- ❌ Lost if user clears browser data
+- ❌ Not suitable for user accounts or order history
+- ✅ Perfect for single-session ordering on same device
+- ✅ Ideal for restaurant in-person ordering via QR code
+
 ---
 
 ## Directory Structure
@@ -250,9 +341,133 @@ restaurant-menu/
 │   ├── README.md               # This file (project planning)
 │   └── specs/                  # Original physical menu scans
 ├── index.html                  # Main menu page
+├── bill.html                   # Bill generation page (v1.1.0)
 ├── .gitignore                  # Git ignore rules
 └── README.md                   # User-facing documentation
 ```
+
+---
+
+## Shopping Cart & Bill System (v1.1.0)
+
+### Architecture Overview
+
+The shopping cart system is a **fully client-side implementation** using browser localStorage for state management. No backend required!
+
+### Components
+
+#### 1. Cart State Management (script.js:9-146)
+**Location:** `static/js/script.js` - Cart object
+
+**Key Methods:**
+- `Cart.init()` - Load cart from localStorage on page load
+- `Cart.addItem(id, name, price, image)` - Add item or increment quantity
+- `Cart.updateQuantity(id, quantity)` - Increment/decrement item quantity
+- `Cart.removeItem(id)` - Remove item from cart
+- `Cart.getTotalItems()` - Calculate total item count for badge
+- `Cart.getTotalPrice()` - Calculate cart subtotal
+- `Cart.save()` - Persist cart to localStorage
+- `Cart.updateCartUI()` - Refresh all UI elements
+- `Cart.showNotification(message)` - Display toast notifications
+
+**Data Persistence:**
+```javascript
+// Save: Automatic on every operation
+localStorage.setItem('restaurantCart', JSON.stringify(items));
+
+// Load: On page initialization
+const savedCart = localStorage.getItem('restaurantCart');
+this.items = savedCart ? JSON.parse(savedCart) : [];
+```
+
+#### 2. Cart UI Components (script.js:583-680)
+
+**Cart Button (Navigation):**
+- Shopping cart icon (🛒)
+- Item count badge (dynamically updated)
+- Click to open cart sidebar
+
+**Cart Sidebar:**
+- Slide-in panel (400px on desktop, full-width on mobile)
+- Cart header with close button
+- Scrollable items list
+- Empty cart message
+- Cart footer with total and actions
+
+**Add to Cart Buttons:**
+- Dynamically added to all 126 dish cards
+- Button animation on click (✓ Added)
+- Extracts dish data from card HTML
+
+**Cart Items Display:**
+- Dish image thumbnail (60x60px)
+- Item name and price
+- Quantity controls (+/-)
+- Remove button (🗑️)
+- Real-time total per item
+
+#### 3. Bill Generation Page (bill.html)
+
+**Full-Featured Invoice System:**
+
+**Header Section:**
+- Restaurant branding
+- Auto-generated bill number (format: BKK + YYMM + 4-digit random)
+- Current date and time (Indian format)
+
+**Order Details Table:**
+- Column headers: Item | Qty | Price | Amount
+- All cart items with calculated totals
+- Professional table styling
+
+**Bill Calculations:**
+- Subtotal: Sum of all items
+- GST (5%): Government tax
+- Service Charge (2%): Restaurant fee
+- Grand Total: Final amount
+
+**Action Buttons:**
+- 🖨️ Print Bill - Opens print dialog (print-optimized CSS)
+- ← Back to Menu - Returns to index.html
+- 🗑️ Clear Bill - Clears cart with confirmation
+
+**Empty State:**
+- Friendly message when cart is empty
+- "Browse Menu" button
+
+### User Flow
+
+```
+1. Customer scans QR code → Opens index.html
+2. Browses menu, clicks "Add to Cart" on desired items
+3. Cart badge shows item count in navigation
+4. Clicks cart icon to review items
+5. Adjusts quantities (+/-) or removes items
+6. Clicks "Proceed to Bill"
+7. Views itemized bill with taxes
+8. Clicks "Print Bill" to generate receipt
+9. (Optional) Clears cart for next customer
+```
+
+### Technical Benefits
+
+✅ **Zero Backend** - No server, database, or API needed
+✅ **Instant Performance** - All operations < 1ms
+✅ **Offline Ready** - Works without internet after initial load
+✅ **Cost Effective** - No hosting fees for backend infrastructure
+✅ **Privacy Focused** - No data leaves user's device
+✅ **Mobile Optimized** - Responsive design for QR code scanning
+✅ **Print Ready** - Professional invoice layout for printing
+
+### Code Statistics
+
+| Component | Lines | File |
+|-----------|-------|------|
+| Cart Logic | ~150 | script.js |
+| Cart UI | ~100 | script.js |
+| Cart CSS | ~350 | styles.css |
+| Bill Page | ~500 | bill.html |
+| **Total** | **~1,100** | 3 files |
 
 ---
 
@@ -274,11 +489,11 @@ restaurant-menu/
 
 ## Future Enhancements
 
-### v1.1.0 (Next Release - In Progress)
+### v1.1.0 (Current Release - Nearly Complete)
 - [ ] Restaurant logo in header
-- [ ] Shopping cart with quantity controls
-- [ ] Bill generation page
-- [ ] Modern UI update with animations
+- [x] Shopping cart with quantity controls (COMPLETED ✅)
+- [x] Bill generation page (COMPLETED ✅)
+- [x] Modern UI update with animations (COMPLETED ✅)
 
 ### v1.2.0
 - [ ] Gallery page with restaurant photos
@@ -320,6 +535,22 @@ restaurant-menu/
 3. Preview locally
 4. Commit and push
 
+### Managing Shopping Cart
+The shopping cart uses localStorage for persistence. To clear all carts:
+```javascript
+// In browser console
+localStorage.removeItem('restaurantCart');
+```
+
+### Testing Cart Functionality
+1. Open `index.html` in browser
+2. Add items to cart using "Add to Cart" buttons
+3. Click cart icon to view sidebar
+4. Adjust quantities or remove items
+5. Click "Proceed to Bill" to view `bill.html`
+6. Test print functionality
+7. Refresh page to verify persistence
+
 ---
 
 ## Project Metrics
@@ -329,17 +560,30 @@ restaurant-menu/
 | Total Dishes | 126 |
 | Categories | 16 |
 | Images | 126 (12MB) |
-| Lines of HTML | ~2,000 |
-| Lines of CSS | ~800 |
-| Lines of JS | ~400 |
+| Pages | 2 (index.html, bill.html) |
+| Lines of HTML | ~3,000 (index: ~2,000, bill: ~500) |
+| Lines of CSS | ~1,596 (styles: ~1,596) |
+| Lines of JS | ~715 (script: ~715) |
+| Cart Code | ~250 lines (JS) + ~350 lines (CSS) |
 | GitHub Workflows | 4 |
-| Development Time | 2 days |
-| Current Version | 1.0.0 ✅ |
-| Next Version | 1.1.0 (In Progress) |
-| Status | Production Ready + Enhancement Phase |
+| Development Time | v1.0: 2 days, v1.1: 1 day |
+| Current Version | 1.1.0 (Nearly Complete) ✅ |
+| Status | E-Commerce + Modern UI Active |
+
+### Feature Breakdown
+
+| Feature | Status | Lines of Code |
+|---------|--------|---------------|
+| Menu Display | ✅ Production | ~2,000 |
+| Search & Filter | ✅ Production | ~200 |
+| Shopping Cart | ✅ Completed | ~600 |
+| Bill Generation | ✅ Completed | ~500 |
+| Modern UI | ✅ Completed | ~700 |
+| CI/CD Workflows | ✅ Production | ~400 |
+| **Total** | | **~4,400** |
 
 ---
 
 **Last Updated:** October 2025
-**Version:** 1.0.0 (Production) → 1.1.0 (In Development)
-**Status:** 🚀 Production Ready + 🔨 Adding E-Commerce Features
+**Version:** 1.1.0 (E-Commerce + Modern UI)
+**Status:** 🚀 Production Ready + 🛒 Shopping Cart Active + 🧾 Bill Generation Ready + 🎨 Modern UI Enhanced
