@@ -5,7 +5,7 @@
     "dishes" : [ {
       "id" : "papad",
       "name" : "Papad",
-      "price" : 11,
+      "price" : 13,
       "image" : "static/images/dishes/papad.jpg",
       "description" : "",
       "available" : true,
