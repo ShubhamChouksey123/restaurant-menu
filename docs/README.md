@@ -146,16 +146,33 @@ Transform traditional physical restaurant menus into a modern digital experience
 - ✅ **Consistent Styling** - Matches red/maroon theme from main site
 - ✅ **Three Gallery Sections** - Ambiance, Food Presentation, Special Events
 
-### 🚧 Planned Features (v1.2.0 - Remaining)
+### ✅ Completed (v1.3.0 - Contact Page)
+
+#### Contact Page
+- ✅ **contact.html** - Complete contact information page
+- ✅ **Contact Cards** - Address, phone, and email with icons
+- ✅ **Google Maps Integration** - Interactive map with real location (Naveen's Bapu Ki Kutia Khajuri)
+- ✅ **Operating Hours** - 7-day schedule with current day highlight
+- ✅ **Contact Form** - Name, email, phone, message fields (UI complete)
+  - ⚠️ **Note:** Form is display-only, no backend integration yet
+  - Shows alert confirmation but doesn't save/send data
+  - Ready for backend integration (see Maintenance Guide)
+- ✅ **Responsive Design** - Mobile-optimized layout
+- ✅ **Consistent Styling** - Matches red/maroon theme
+- ✅ **Interactive Elements** - Hover effects and smooth animations
+- ✅ **Call-to-Action Links** - Direct phone, email, and directions links
+
+### 🚧 Planned Features (v1.3.0 - Remaining)
 
 - [ ] **Restaurant Logo** - Brand identity in header
+- [ ] **Contact Form Backend** - Enable form submission (FormSubmit/Formspree integration)
 
 ### 🚧 Future Versions
 
-- [ ] **contact.html** - Contact information and Google Maps
 - [ ] **Multi-language** - Hindi + English support
 - [ ] **Admin Panel** - Easy menu updates without coding
 - [ ] **More Gallery Images** - Additional food presentation and event photos
+- [ ] **Online Ordering** - Order placement and payment integration
 
 ---
 
@@ -357,6 +374,7 @@ restaurant-menu/
 ├── index.html                  # Main menu page
 ├── bill.html                   # Bill generation page (v1.1.0)
 ├── gallery.html                # Photo gallery page (v1.2.0)
+├── contact.html                # Contact information page (v1.3.0)
 ├── .gitignore                  # Git ignore rules
 └── README.md                   # User-facing documentation
 ```
@@ -603,6 +621,203 @@ const galleryData = {
 
 ---
 
+## Contact Page System (v1.3.0)
+
+### Architecture Overview
+
+The contact page is a **fully responsive information hub** with Google Maps integration and contact form. Pure client-side implementation!
+
+### Components
+
+#### 1. Contact Cards Grid (contact.html:63-153)
+**Three Information Cards:**
+
+**Address Card:**
+- Restaurant name and full address
+- "Get Directions" link to Google Maps
+- Direct navigation support
+
+**Phone Card:**
+- Primary contact number with tel: link
+- Operating hours information
+- Click-to-call functionality
+
+**Email Card:**
+- Email address with mailto: link
+- Response time expectation
+- Click-to-email functionality
+
+**Features:**
+- Responsive 3-column grid (desktop), 2-column (tablet), 1-column (mobile)
+- Icon-based visual hierarchy
+- Hover effects with elevation
+- Direct action links (call, email, directions)
+
+#### 2. Operating Hours Section (contact.html:155-183)
+**7-Day Schedule Display:**
+
+**Features:**
+- Weekly hours in organized table format
+- Auto-highlight current day with gradient background
+- Consistent hours display (11:00 AM - 11:00 PM daily)
+- Glassmorphism card design
+- Responsive layout for mobile
+
+**JavaScript Auto-Detection:**
+```javascript
+const today = days[new Date().getDay()];
+// Highlights current day with .today class
+```
+
+#### 3. Google Maps Integration (contact.html:185-200)
+**Interactive Map Embed:**
+
+**Features:**
+- Full-width responsive iframe
+- 450px height on desktop, 350px on mobile
+- Lazy loading for performance
+- Rounded corners matching site design
+- Shows restaurant location on NH-18, Bhopal
+- Zoom, pan, and directions support
+
+**Map Specifications:**
+- Embedded via Google Maps iframe
+- Location: Khajuri Sadak, NH-18, Bhopal
+- Supports fullscreen mode
+- No-referrer-when-downgrade policy
+
+#### 4. Contact Form (contact.html:202-244)
+**Full-Featured Message Form:**
+
+**Form Fields:**
+- Name (required) - Text input
+- Email (required) - Email validation
+- Phone (optional) - Tel input
+- Message (required) - Textarea with min-height
+
+**Features:**
+- Client-side form validation
+- Focus states with border color change
+- Smooth transitions on all inputs
+- Full-width submit button with gradient
+- Form reset after successful submission
+- Alert confirmation (placeholder for backend integration)
+
+**Form Styling:**
+- 2px border with focus highlight
+- Border-radius for modern look
+- Box shadow on focus
+- Consistent padding and spacing
+
+### Page Layout
+
+**Sections from top to bottom:**
+1. **Header** - Restaurant branding with address
+2. **Navigation** - Menu, Gallery, Contact, Cart
+3. **Hero Section** - "Get In Touch" with gradient background
+4. **Contact Cards** - Address, Phone, Email information
+5. **Operating Hours** - Weekly schedule with current day highlight
+6. **Map Section** - Google Maps embed
+7. **Contact Form** - Message submission form
+8. **Footer** - About, Quick Links, Contact Info
+
+### User Flow
+
+```
+1. Customer clicks "Contact" in navigation
+2. Views contact cards with address, phone, email
+3. Can click to call, email, or get directions
+4. Scrolls to see operating hours (today highlighted)
+5. Views location on interactive Google Map
+6. Optionally fills out contact form
+7. Submits message and receives confirmation
+8. Returns to menu or gallery via navigation
+```
+
+### Technical Benefits
+
+✅ **Zero Backend Required** - Pure client-side (form can integrate with backend later)
+✅ **Responsive Design** - Perfect on all screen sizes
+✅ **Interactive Map** - Google Maps with full functionality
+✅ **Click-to-Call** - Direct phone dialing on mobile
+✅ **Click-to-Email** - Opens default email client
+✅ **Auto Day Highlight** - JavaScript detects current day
+✅ **Form Validation** - HTML5 required fields
+✅ **Consistent Styling** - Matches red/maroon theme
+✅ **SEO Friendly** - Proper meta tags and structured data
+✅ **Accessibility** - Semantic HTML and ARIA labels
+
+### Code Statistics
+
+| Component | Lines | File |
+|-----------|-------|------|
+| Contact HTML | ~950 | contact.html |
+| Contact CSS | ~330 | contact.html (inline) |
+| Contact JS | ~50 | contact.html (inline) |
+| **Total** | **~1,330** | 1 file |
+
+### Integration Points
+
+**Future Backend Integration:**
+- Form submission can POST to server endpoint
+- Email notifications on form submission
+- Database storage of contact inquiries
+- CAPTCHA integration for spam prevention
+- Auto-reply email to customer
+
+**Current Implementation:**
+- **⚠️ IMPORTANT:** Form is currently **display-only** - no data is saved or sent
+- Client-side only with alert confirmation
+- Form data collected but discarded after alert message
+- Form resets after submission
+- No data persistence (ready for backend integration)
+
+**How Current Form Works:**
+```javascript
+// contact.html:545-563
+contactForm.addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevents actual form submission
+
+    const formData = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        message: document.getElementById('message').value
+    };
+
+    // Shows alert but doesn't save/send data anywhere
+    alert('Thank you for your message! We will get back to you soon.');
+    contactForm.reset(); // Data is lost here
+});
+```
+
+**To Make Form Functional (Choose One):**
+
+1. **Email Service (Recommended - Easiest):**
+   - Services: FormSubmit.co, Formspree.io, or EmailJS
+   - No backend code needed
+   - Simply update form action attribute
+   - Free tier available
+   - Example: `<form action="https://formsubmit.co/your@email.com" method="POST">`
+
+2. **Backend Integration:**
+   - Create server endpoint (Node.js/Express, PHP, Python Flask)
+   - POST form data to server
+   - Send email or store in database
+   - Requires hosting backend service
+
+3. **Google Forms/Sheets:**
+   - Use Google Forms submission endpoint
+   - Data goes to Google Sheets
+   - Free but requires Google account setup
+
+4. **Netlify Forms:**
+   - Add `netlify` attribute to form
+   - Automatic handling if hosted on Netlify
+   - Free tier available
+
+---
+
 ## Future Enhancements
 
 ### v1.1.0 (COMPLETED ✅)
@@ -610,14 +825,18 @@ const galleryData = {
 - [x] Bill generation page (COMPLETED ✅)
 - [x] Modern UI update with animations (COMPLETED ✅)
 
-### v1.2.0 (Current Release - Nearly Complete)
-- [ ] Restaurant logo in header
+### v1.2.0 (COMPLETED ✅)
 - [x] Gallery page with restaurant photos (COMPLETED ✅)
-- [ ] Contact page with Google Maps
-- [ ] Operating hours display
+
+### v1.3.0 (Current Release - Core Features Complete)
+- [x] Contact page with Google Maps (COMPLETED ✅)
+- [x] Operating hours display with auto-highlight (COMPLETED ✅)
+- [x] Contact form UI (COMPLETED ✅)
+- [ ] Contact form backend integration (FormSubmit/Formspree)
+- [ ] Restaurant logo in header
 - [ ] Customer reviews section
 
-### v1.3.0
+### v1.4.0
 - [ ] Special offers banner
 - [ ] Chef recommendations
 - [ ] Seasonal menu highlights
@@ -690,6 +909,52 @@ galleryData.ambiance.push({
 5. Test close functionality (X button, Escape key, clicking outside)
 6. Verify responsive behavior on different screen sizes
 
+### Managing Contact Form
+
+**Current Status:**
+The contact form is currently **display-only** and doesn't save or send data anywhere. It shows an alert confirmation but discards the form data.
+
+**To Enable Form Submissions (Quickest Method - FormSubmit.co):**
+1. Open `contact.html` in your editor
+2. Find the form tag: `<form class="contact-form" id="contact-form">`
+3. Update it to:
+```html
+<form class="contact-form" id="contact-form" action="https://formsubmit.co/your@email.com" method="POST">
+```
+4. Remove the JavaScript form handler (lines 545-563) or comment it out
+5. Replace `your@email.com` with your actual email address
+6. (Optional) Add FormSubmit configuration fields:
+```html
+<input type="hidden" name="_subject" value="New contact form submission from Bapu Ki Kutia">
+<input type="hidden" name="_captcha" value="false">
+<input type="hidden" name="_template" value="table">
+```
+7. Test by filling out and submitting the form
+8. Verify email received at your inbox
+
+**Alternative: Formspree.io**
+1. Sign up at Formspree.io (free tier available)
+2. Create a new form and get your endpoint URL
+3. Update form tag: `<form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">`
+4. Remove or comment out JavaScript handler
+5. Test submission
+
+### Testing Contact Form
+**Current Implementation:**
+1. Open `contact.html` in browser
+2. Fill out all required fields (name, email, message)
+3. Click "Send Message"
+4. Verify alert appears: "Thank you for your message! We will get back to you soon."
+5. Verify form fields are cleared
+6. Note: **No data is saved** - this is expected behavior
+
+**After Enabling Backend/Service:**
+1. Fill out form with real email address
+2. Submit form
+3. Check your email inbox for form submission
+4. Verify all form fields are received correctly
+5. Test spam protection (if enabled)
+
 ---
 
 ## Project Metrics
@@ -700,16 +965,17 @@ galleryData.ambiance.push({
 | Categories | 16 |
 | Dish Images | 126 (12MB) |
 | Gallery Images | 4 (560KB) |
-| Pages | 3 (index.html, bill.html, gallery.html) |
-| Lines of HTML | ~3,600 (index: ~2,000, bill: ~500, gallery: ~600) |
-| Lines of CSS | ~1,900 (styles: ~1,596, gallery inline: ~324) |
-| Lines of JS | ~865 (script: ~715, gallery: ~150) |
+| Pages | 4 (index.html, bill.html, gallery.html, contact.html) |
+| Lines of HTML | ~4,550 (index: ~2,000, bill: ~500, gallery: ~600, contact: ~950) |
+| Lines of CSS | ~2,250 (styles: ~1,596, gallery inline: ~324, contact inline: ~330) |
+| Lines of JS | ~915 (script: ~715, gallery: ~150, contact: ~50) |
 | Cart Code | ~250 lines (JS) + ~350 lines (CSS) |
 | Gallery Code | ~150 lines (JS) + ~324 lines (CSS) |
+| Contact Code | ~50 lines (JS) + ~330 lines (CSS) |
 | GitHub Workflows | 4 |
-| Development Time | v1.0: 2 days, v1.1: 1 day, v1.2: 0.5 days |
-| Current Version | 1.2.0 (Nearly Complete) ✅ |
-| Status | E-Commerce + Modern UI + Gallery Active |
+| Development Time | v1.0: 2 days, v1.1: 1 day, v1.2: 0.5 days, v1.3: 0.5 days |
+| Current Version | 1.3.0 (Nearly Complete) ✅ |
+| Status | E-Commerce + Modern UI + Gallery + Contact Active |
 
 ### Feature Breakdown
 
@@ -721,11 +987,16 @@ galleryData.ambiance.push({
 | Bill Generation | ✅ Completed | ~500 |
 | Modern UI | ✅ Completed | ~700 |
 | Gallery Page | ✅ Completed | ~474 |
+| Contact Page | ✅ Completed | ~950 |
 | CI/CD Workflows | ✅ Production | ~400 |
-| **Total** | | **~4,874** |
+| **Total** | | **~5,824** |
 
 ---
 
 **Last Updated:** October 2025
-**Version:** 1.2.0 (E-Commerce + Modern UI + Gallery)
-**Status:** 🚀 Production Ready + 🛒 Shopping Cart Active + 🧾 Bill Generation Ready + 🎨 Modern UI Enhanced + 📸 Gallery Live
+**Version:** 1.3.0 (E-Commerce + Modern UI + Gallery + Contact)
+**Status:** 🚀 Production Ready + 🛒 Shopping Cart Active + 🧾 Bill Generation Ready + 🎨 Modern UI Enhanced + 📸 Gallery Live + 📞 Contact Page Active (Form UI Complete)
+
+**Important Notes:**
+- ⚠️ Contact form is display-only (no backend yet) - see "Managing Contact Form" section for integration guide
+- All other features are fully functional and production-ready
