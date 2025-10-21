@@ -8,7 +8,7 @@
       "price" : 16,
       "image" : "static/images/dishes/papad.jpg",
       "description" : "",
-      "available" : false,
+      "available" : true,
       "tags" : [ ],
       "alt_text" : "Papad",
       "category_id" : "accompaniments",
