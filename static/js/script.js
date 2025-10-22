@@ -4,6 +4,134 @@
    ================================================================= */
 
 // =================================================================
+// Menu Data Management - Load from JSON
+// =================================================================
+let menuData = null;
+
+async function loadMenuData() {
+    try {
+        const response = await fetch('static/data/menu-data.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        menuData = await response.json();
+        return menuData;
+    } catch (error) {
+        console.error('Error loading menu data:', error);
+        showErrorMessage('Failed to load menu. Please refresh the page.');
+        return null;
+    }
+}
+
+function renderCategoryNav(categories) {
+    const navContainer = document.getElementById('categoryNavContainer');
+    if (!navContainer) return;
+
+    const categoryLinks = categories
+        .sort((a, b) => a.display_order - b.display_order)
+        .map(category => `<a href="#${category.id}">${category.name.split('(')[0].trim()}</a>`)
+        .join('');
+
+    navContainer.innerHTML = categoryLinks;
+}
+
+function renderMenuCategories(categories) {
+    const menuContainer = document.getElementById('menuContainer');
+    if (!menuContainer) return;
+
+    const menuHTML = categories
+        .sort((a, b) => a.display_order - b.display_order)
+        .map(category => {
+            const availableDishes = category.dishes.filter(dish => dish.available);
+
+            if (availableDishes.length === 0) {
+                return ''; // Skip empty categories
+            }
+
+            const dishesHTML = availableDishes.map(dish => `
+                <div class="dish-card" data-dish-id="${dish.id}">
+                    <img src="${dish.image}" alt="${dish.alt_text || dish.name}" loading="lazy">
+                    <h3>${dish.name}</h3>
+                    <p class="price">₹${dish.price}</p>
+                </div>
+            `).join('');
+
+            return `
+                <section id="${category.id}" class="menu-category">
+                    <h2>${category.name}</h2>
+                    <div class="dish-grid">
+                        ${dishesHTML}
+                    </div>
+                </section>
+            `;
+        })
+        .join('');
+
+    menuContainer.innerHTML = menuHTML;
+}
+
+function hideLoadingIndicator() {
+    const indicator = document.getElementById('loadingIndicator');
+    if (indicator) {
+        indicator.style.display = 'none';
+    }
+}
+
+function showErrorMessage(message) {
+    const menuContainer = document.getElementById('menuContainer');
+    if (menuContainer) {
+        menuContainer.innerHTML = `
+            <div style="text-align: center; padding: 50px; color: #c41e3a;">
+                <h2>⚠️ ${message}</h2>
+                <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #c41e3a; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Reload Page
+                </button>
+            </div>
+        `;
+    }
+}
+
+async function initializeMenu() {
+    try {
+        // Load menu data from JSON
+        const data = await loadMenuData();
+
+        if (!data || !data.categories) {
+            throw new Error('Invalid menu data structure');
+        }
+
+        // Render category navigation and menu
+        renderCategoryNav(data.categories);
+        renderMenuCategories(data.categories);
+
+        // Hide loading indicator
+        hideLoadingIndicator();
+
+        // Initialize all interactive features after menu is rendered
+        Cart.init();
+        initSmoothScrolling();
+        initCategoryNavigation();
+        initActiveNavigation();
+        initScrollToTop();
+        initImageErrorHandling();
+        initSearchFunctionality();
+        initCategoryHighlight();
+        initMobileMenu();
+        initCartUI();
+        initAddToCartButtons();
+        addCategoryCounters();
+        initPriceFilter();
+
+        console.log('✅ Restaurant Menu loaded successfully!');
+        console.log(`📊 Loaded ${data.categories.length} categories with ${data.categories.reduce((sum, cat) => sum + cat.dishes.length, 0)} dishes`);
+    } catch (error) {
+        console.error('Error initializing menu:', error);
+        hideLoadingIndicator();
+        showErrorMessage('Failed to load menu. Please refresh the page.');
+    }
+}
+
+// =================================================================
 // Shopping Cart State Management
 // =================================================================
 const Cart = {
@@ -149,18 +277,8 @@ const Cart = {
 // DOM Content Loaded - Initialize when page is ready
 // =================================================================
 document.addEventListener('DOMContentLoaded', function() {
-    Cart.init();
-    initSmoothScrolling();
-    initCategoryNavigation();
-    initActiveNavigation();
-    initScrollToTop();
-    initImageErrorHandling();
-    initSearchFunctionality();
-    initCategoryHighlight();
-    initMobileMenu();
-    initCartUI();
-    initAddToCartButtons();
-    console.log('✅ Restaurant Menu loaded successfully!');
+    // Initialize menu with data from JSON
+    initializeMenu();
 });
 
 // =================================================================
@@ -468,8 +586,7 @@ function addCategoryCounters() {
     });
 }
 
-// Initialize category counters after DOM is loaded
-document.addEventListener('DOMContentLoaded', addCategoryCounters);
+// Category counters are initialized in initializeMenu()
 
 // =================================================================
 // Performance: Lazy Loading for Images
@@ -559,8 +676,7 @@ function initPriceFilter() {
     });
 }
 
-// Initialize price filter
-document.addEventListener('DOMContentLoaded', initPriceFilter);
+// Price filter is initialized in initializeMenu()
 
 // =================================================================
 // Utility: Debounce Function
