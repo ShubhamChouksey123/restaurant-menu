@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Slf4j
 @Service
@@ -26,6 +28,7 @@ public class GitService {
     private final GitConfig gitConfig;
     private Git git;
     private UsernamePasswordCredentialsProvider credentialsProvider;
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitService.class);
 
     @PostConstruct
     public void initialize() {
@@ -43,7 +46,13 @@ public class GitService {
             if (localPath.exists() && new File(localPath, ".git").exists()) {
                 log.info("Repository already exists at: {}", localPath.getAbsolutePath());
                 git = Git.open(localPath);
-                pullLatestChanges();
+
+                // Skip pull if configured (useful for local development)
+                if (gitConfig.getLocal().isSkipPull()) {
+                    log.info("Skipping pull (skip-pull=true in configuration)");
+                } else {
+                    pullLatestChanges();
+                }
             } else {
                 log.info("Cloning repository to: {}", localPath.getAbsolutePath());
                 cloneRepository(localPath);
@@ -127,6 +136,7 @@ public class GitService {
     public String readMenuFile() {
         try {
             Path menuPath = getMenuFilePath();
+            LOGGER.info("menuPath: {}", menuPath.toString());
             if (!Files.exists(menuPath)) {
                 throw new GitOperationException("Menu file not found at: " + menuPath);
             }

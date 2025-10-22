@@ -17,7 +17,7 @@ github:
     file-path: static/data/menu-data.json
 
   local:
-    clone-directory: ${user.home}/.restaurant-menu-repo
+    clone-directory: ${CLONE_DIRECTORY_LOCATION:${user.home}/.restaurant-menu-repo}
 
 # JWT Configuration
 jwt:

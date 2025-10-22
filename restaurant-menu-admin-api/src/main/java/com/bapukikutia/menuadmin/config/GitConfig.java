@@ -29,5 +29,6 @@ public class GitConfig {
     @Data
     public static class Local {
         private String cloneDirectory;
+        private boolean skipPull = false;  // Skip pull in local development
     }
 }
