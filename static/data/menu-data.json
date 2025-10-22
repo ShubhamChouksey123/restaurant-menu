@@ -18,7 +18,7 @@
     }, {
       "id" : "papad-fry",
       "name" : "Papad Fry",
-      "price" : 25,
+      "price" : 20,
       "image" : "static/images/dishes/papad-fry.jpg",
       "description" : "",
       "available" : true,
