@@ -572,11 +572,11 @@ nav a.active {
     gap: 0.3rem;
 }
 
-.dish-card .price::before {
+/* .dish-card .price::before {
     content: '₹';
     font-size: 1.1rem;
     opacity: 0.8;
-}
+} */
 
 /* -----------------------------------------------------------------
    Footer Styles
