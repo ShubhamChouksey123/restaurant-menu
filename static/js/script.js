@@ -8,6 +8,10 @@
 // =================================================================
 let menuData = null;
 
+// =================================================================
+// Rating Display - Simple Star Generation
+// =================================================================
+
 async function loadMenuData() {
     try {
         const response = await fetch('static/data/menu-data.json');
@@ -21,6 +25,32 @@ async function loadMenuData() {
         showErrorMessage('Failed to load menu. Please refresh the page.');
         return null;
     }
+}
+
+// Simple function to generate star HTML from rating
+function generateStarHTML(rating) {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+    let starsHTML = '';
+
+    // Full stars
+    for (let i = 0; i < fullStars; i++) {
+        starsHTML += '<span class="star star-full">★</span>';
+    }
+
+    // Half star
+    if (hasHalfStar) {
+        starsHTML += '<span class="star star-half">★</span>';
+    }
+
+    // Empty stars
+    for (let i = 0; i < emptyStars; i++) {
+        starsHTML += '<span class="star star-empty">☆</span>';
+    }
+
+    return starsHTML;
 }
 
 function renderCategoryNav(categories) {
@@ -48,13 +78,27 @@ function renderMenuCategories(categories) {
                 return ''; // Skip empty categories
             }
 
-            const dishesHTML = availableDishes.map(dish => `
+            const dishesHTML = availableDishes.map(dish => {
+                // Determine rating color class
+                const rating = dish.rating || 0;
+                let ratingClass = 'rating-low';
+                if (rating >= 4.5) ratingClass = 'rating-high';
+                else if (rating >= 4.0) ratingClass = 'rating-medium';
+
+                return `
                 <div class="dish-card" data-dish-id="${dish.id}">
                     <img src="${dish.image}" alt="${dish.alt_text || dish.name}" loading="lazy">
                     <h3>${dish.name}</h3>
-                    <p class="price">₹${dish.price}</p>
+                    <div class="price-rating-row">
+                        <p class="price">₹${dish.price}</p>
+                        <div class="dish-rating ${ratingClass}">
+                            <span class="star">★</span>
+                            <span class="rating-value">${rating || '-'}</span>
+                        </div>
+                    </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
 
             return `
                 <section id="${category.id}" class="menu-category">
@@ -789,9 +833,8 @@ function initAddToCartButtons() {
             }, 1500);
         });
 
-        // Add button to card
-        const priceElement = card.querySelector('.price');
-        priceElement.parentNode.insertBefore(addToCartBtn, priceElement.nextSibling);
+        // Add button to card - append at the end
+        card.appendChild(addToCartBtn);
     });
 }
 
